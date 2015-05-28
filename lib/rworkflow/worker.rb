@@ -19,7 +19,7 @@ module Rworkflow
         end
       end
     rescue Exception => e
-      CimLog.error("Exception produced on #{self.class.name} for flow #{id} on perform: #{e.message}\n#{e.backtrace}")
+      #"Exception produced on #{self.class.name} for flow #{id} on perform: #{e.message}\n#{e.backtrace}")
       raise e
     end
 
@@ -49,7 +49,7 @@ module Rworkflow
           return workflow
         end
 
-        CimLog.report(REPORT_MISSING_FLOW, "Worker #{self.name} tried to load non existent workflow #{id}")
+        #report(REPORT_MISSING_FLOW, "Worker #{self.name} tried to load non existent workflow #{id}")
         return nil
       end
     end

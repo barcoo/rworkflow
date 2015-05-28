@@ -10,6 +10,7 @@ PATH
   specs:
     rworkflow (0.0.1)
       rails (~> 4.1.1)
+      sidekiq (~> 3.2.5)
 
 GEM
   remote: https://rubygems.org/
@@ -99,5 +100,4 @@ PLATFORMS
 DEPENDENCIES
   redis_rds!
   rworkflow!
-  sidekiq (= 3.2.5)
   sqlite3
