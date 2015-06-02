@@ -362,7 +362,7 @@ module Rworkflow
         workflow.lifecycle = lifecycle
         workflow.set(:created_at, Time.now.to_i)
         workflow.set(:public, options.fetch(:public, false))
-        workflow.set(:logging, options.fetch(:logging, false))
+        workflow.set(:logging, options.fetch(:logging, true))
 
         self.register(workflow)
 
