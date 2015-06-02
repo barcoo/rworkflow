@@ -39,7 +39,7 @@ module Rworkflow
       # end
 
       def should_perform_job_async?
-        return Rails.env.production? || (Rails.env.development? && Socket.gethostname.include?("pandora") && !Rails.root.to_s.match(/_500.$/).nil?)
+        return Rails.env.production?
       end
 
       def inline_perform(params)
