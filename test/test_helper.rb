@@ -6,6 +6,16 @@ require "rails/test_help"
 
 Rails.backtrace_cleaner.remove_silencers!
 
+RedisRds.configure({
+    :host => "localhost",
+    :db => 1,
+    :port => 6379,
+    :timeout => 30,
+    :thread_safe => true,
+    :namespace => "testns"
+  }
+)
+
 # Load support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
