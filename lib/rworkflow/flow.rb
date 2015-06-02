@@ -222,7 +222,36 @@ module Rworkflow
 
       if to_state.present?
         push(objects, to_state)
+        log(from_state, name, objects.size)
       end
+    end
+
+    def logging?
+      return get(:logging, false)
+    end
+
+    def log(from_state, transition, num_objects)
+      logger.incrby("#{from_state}__#{transition}", num_objects.to_i) if logging?
+    end
+
+    def logger
+      return @logger ||= begin
+        RedisRds::Hash.new("#{@redis_key}__logger")
+      end
+    end
+
+    def logs
+      logs = {}
+      if valid? && logging?
+        state_transition_counters = logger.getall
+        state_transition_counters.each do |state_transition, counter|
+          state, transition = state_transition.split('__')
+          logs[state] = {} unless logs.key?(state)
+          logs[state][transition] = counter.to_i
+        end
+      end
+
+      return logs
     end
 
     def get_state_cardinality(state_name)
@@ -269,6 +298,7 @@ module Rworkflow
       @processing.delete
       @storage.delete
       @flow_data.delete
+      logger.delete if logging?
       self.class.unregister(self)
     end
 
@@ -283,6 +313,7 @@ module Rworkflow
       self.set(:start_time, Time.now.to_i)
       self.set(:start_count, objects.size)
       push(objects, lifecycle.initial)
+      log(lifecycle.initial, 'initial', objects.size)
     end
 
     def total_objects_processed(counters = nil)
@@ -331,6 +362,7 @@ module Rworkflow
         workflow.lifecycle = lifecycle
         workflow.set(:created_at, Time.now.to_i)
         workflow.set(:public, options.fetch(:public, false))
+        workflow.set(:logging, options.fetch(:logging, false))
 
         self.register(workflow)
 
