@@ -96,5 +96,5 @@ Notes:
 
 1. Decouple persistence layer (for now rworkflow depends on redis_rds which, in turn, depends on, guess, redis)
 2. gemify
-3. [State and Transition Policies](https://github.com/barcoo/rworkflow/blob/master/doc/states_and_transitions_policies.rdoc)
+3. {State and Transition Policies}[https://github.com/barcoo/rworkflow/blob/master/doc/states_and_transitions_policies.rdoc]
 4. Test Helper (simplify tests)
