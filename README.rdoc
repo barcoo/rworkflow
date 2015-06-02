@@ -98,3 +98,6 @@ Notes:
 2. gemify
 3. {State and Transition Policies}[https://github.com/barcoo/rworkflow/blob/master/doc/states_and_transitions_policies.rdoc]
 4. Test Helper (simplify tests)
+5. Improve logging
+6. Use a separated Redis instance/db instead of a namespace?
+7. sidekiq dependency should be optional
