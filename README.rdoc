@@ -11,26 +11,26 @@ A simple flow (Flow class) only implements this model, but there is a subclass o
 
 The lifecycle is the definition of the state machine that every job pushed to the workflow will transit:
 
-<pre>
-lifecycle = Workflow::Lifecycle.new do |lc|
-  lc.state("Floating", {cardinality: 10}) do |state|
-    state.transition :rescued, 'Lifeboat'
-    state.transition :drowned, Flow::STATE_FAILED
+
+  lifecycle = Workflow::Lifecycle.new do |lc|
+    lc.state("Floating", {cardinality: 10}) do |state|
+      state.transition :rescued, 'Lifeboat'
+      state.transition :drowned, Flow::STATE_FAILED
+    end
+  
+    lc.state("Lifeboat", {cardinality: 2}) do |state|
+      state.transition :landed, 'Land'
+      state.transition :starved, Flow::STATE_FAILED
+    end
+  
+    lc.state("Land") do |state|
+      state.transition :rescued, Flow::STATE_SUCCESSFUL
+      state.transition :died, Flow::STATE_FAILED
+    end
+  
+    lc.initial = "Floating"
   end
 
-  lc.state("Lifeboat", {cardinality: 2}) do |state|
-    state.transition :landed, 'Land'
-    state.transition :starved, Flow::STATE_FAILED
-  end
-
-  lc.state("Land") do |state|
-    state.transition :rescued, Flow::STATE_SUCCESSFUL
-    state.transition :died, Flow::STATE_FAILED
-  end
-
-  lc.initial = "Floating"
-end
-</pre>
 
 Notes:
 
@@ -43,35 +43,34 @@ Notes:
 
 For SidekiqFlow create a subclass of Workflow::Worker for each state defined on the lifecycle (except for predefined final states)
 
-<pre>
-class Floating < Workflow::Worker
-  def process(objects)
-    # The size of objects will be at the most the cardinality defined on the lifecycle
-    rescued, drowned = objects.partition { |object| object.even? }
 
-    transition(:rescued, rescued)
-    transition(:drowned, drowned)
+  class Floating < Workflow::Worker
+    def process(objects)
+      # The size of objects will be at the most the cardinality defined on the lifecycle
+      rescued, drowned = objects.partition { |object| object.even? }
+  
+      transition(:rescued, rescued)
+      transition(:drowned, drowned)
+    end
   end
-end
-
-class Lifeboat < Workflow::Worker
-  def process(objects)
-    landed, starved = objects.partition { |object| object < 4 }
-
-    transition(:landed, landed)
-    transition(:starved, starved)
+  
+  class Lifeboat < Workflow::Worker
+    def process(objects)
+      landed, starved = objects.partition { |object| object < 4 }
+  
+      transition(:landed, landed)
+      transition(:starved, starved)
+    end
   end
-end
-
-class Land < Workflow::Worker
-  def process(objects)
-    rescued, died = objects.partition { |object| object == 0 }
-
-    transition(:rescued, rescued)
-    transition(:died, died)
+  
+  class Land < Workflow::Worker
+    def process(objects)
+      rescued, died = objects.partition { |object| object == 0 }
+  
+      transition(:rescued, rescued)
+      transition(:died, died)
+    end
   end
-end
-</pre>
 
 Notes:
 - Create a class with the exact name that you defined above in the lifecycle definition
@@ -80,12 +79,12 @@ Notes:
 
 == Create and execute the Workflow
 
-<pre>
+
   options = {}
   workflow = Workflow::SidekiqFlow.create(lifecycle, 'SafeBoatWorkflow', options)
   initial_jobs = [1,2,3,45,6,7,8,9,10]
   workflow.start(initial_jobs)   
-</pre>
+
 
 Notes:
 - Create a new Sidekiq flow using the lifecycle object defined in the firt step above
