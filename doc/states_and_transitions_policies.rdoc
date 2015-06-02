@@ -1,0 +1,11 @@
+= State and Transition Policies
+
+End goal is to decouple the state from the lifecycle to maximise reuse.
+
+== Lifecycle
+
+The lifecycle is now in charge of transitions; states are unaware of their relationships to each other, only of their input/output (as well as maintenance). A lifecycle would be provided with a Transition Policy object, which translates the input/output of each state into a unified format. For example: the lifecycle translates output of state A as input of state B.
+
+h2. State
+
+The state now receives a specific format as input (provided by the Transition Policy object of its lifecycle) and outputs a specific format as well.
