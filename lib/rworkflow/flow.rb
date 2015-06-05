@@ -8,8 +8,6 @@ module Rworkflow
     REDIS_NS = 'flow'
     WORKFLOW_REGISTRY = "#{REDIS_NS}:__registry"
 
-    REPORT_KEY_UNKNOWN_FLOW_CLASS = 'UNKNOWN_FLOW_CLASS'
-
     attr_accessor :id
     attr_reader :lifecycle
 
@@ -38,11 +36,11 @@ module Rworkflow
 
     def finished?
       return false unless self.started?
-      sum = get_counters.reduce(0) do |sum, pair|
+      total = get_counters.reduce(0) do |sum, pair|
         self.class.terminal?(pair[0]) ? sum : (sum + pair[1].to_i)
       end
 
-      return sum == 0
+      return total == 0
     end
 
     def status
@@ -94,7 +92,7 @@ module Rworkflow
         counters = begin
           YAML.load(counters)
         rescue Exception => e
-          #error("Error loading stored flow counters: #{e.message}")
+          Rails.logger.error("Error loading stored flow counters: #{e.message}")
           nil
         end
       end
@@ -144,7 +142,7 @@ module Rworkflow
 
           if failed.present?
             push(failed, STATE_FAILED)
-            #error("Failed to parse #{failed.size} in workflow #{self.id} for fetcher id #{fetcher_id} at state #{state_name}")
+            Rails.logger.error("Failed to parse #{failed.size} in workflow #{self.id} for fetcher id #{fetcher_id} at state #{state_name}")
           end
 
           yield(objects) if block_given?
@@ -167,7 +165,7 @@ module Rworkflow
       if state.present?
         list = get_list(state_name)
       else
-        #error("Tried accessing invalid state #{state_name} for workflow #{id}")
+        Rails.logger.error("Tried accessing invalid state #{state_name} for workflow #{id}")
       end
       return list
     end
@@ -216,7 +214,7 @@ module Rworkflow
       to_state = begin
         lifecycle.transition(from_state, name)
       rescue Rworkflow::StateError => e
-        #error("Error transitioning: #{e}")
+        Rails.logger.error("Error transitioning: #{e}")
         nil
       end
 
@@ -406,7 +404,7 @@ module Rworkflow
         klass = begin
           raw_class.constantize
         rescue NameError => _
-          #report(REPORT_KEY_UNKNOWN_FLOW_CLASS, "Unknown flow class for workflow id #{id}")
+          Rails.logger.warn("Unknown flow class for workflow id #{id}")
           nil
         end if raw_class.present?
         return klass

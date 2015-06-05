@@ -5,8 +5,6 @@ module Rworkflow
     include Sidekiq::Worker
     include SidekiqHelper
 
-    REPORT_MISSING_FLOW = 'MISSING_FLOW'
-
     sidekiq_options queue: :mysql2
 
     def perform(id)
@@ -19,7 +17,7 @@ module Rworkflow
         end
       end
     rescue Exception => e
-      #"Exception produced on #{self.class.name} for flow #{id} on perform: #{e.message}\n#{e.backtrace}")
+      Rails.logger.error("Exception produced on #{self.class.name} for flow #{id} on perform: #{e.message}\n#{e.backtrace}")
       raise e
     end
 
@@ -49,7 +47,7 @@ module Rworkflow
           return workflow
         end
 
-        #report(REPORT_MISSING_FLOW, "Worker #{self.name} tried to load non existent workflow #{id}")
+        Rails.logger.warn("Worker #{self.name} tried to load non existent workflow #{id}")
         return nil
       end
     end

@@ -39,8 +39,7 @@ module Rworkflow
       return if self.finished?
       @flow_data.incr(:paused)
     rescue StandardError => e
-      #TBD
-      #error("Error pausing flow #{self.id}: #{e.message}")
+      Rails.logger.error("Error pausing flow #{self.id}: #{e.message}")
     end
 
     # for now assumes
@@ -53,8 +52,7 @@ module Rworkflow
         workers.each { |worker, num_objects| create_jobs(worker, num_objects) }
       end
     rescue StandardError => e
-      #TBD
-      #error("Error continuing flow #{self.id}: #{e.message}")
+      Rails.logger.error("Error continuing flow #{self.id}: #{e.message}")
     end
 
     def create_jobs(state_name, num_objects)
@@ -62,7 +60,7 @@ module Rworkflow
       worker_class = begin
         state_name.constantize
       rescue NameError => _
-        #error("Trying to push to a non existent worker class #{state_name} in workflow #{@id}")
+        Rails.logger.error("Trying to push to a non existent worker class #{state_name} in workflow #{@id}")
         nil
       end
 
