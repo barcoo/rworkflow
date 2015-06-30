@@ -87,7 +87,7 @@ module Rworkflow
     end
 
     def get_counters
-      counters= @storage.get(:counters)
+      counters = @storage.get(:counters)
       if counters.present?
         counters = begin
           YAML.load(counters)

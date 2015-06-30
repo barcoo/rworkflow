@@ -44,6 +44,14 @@ module Rworkflow
       return self
     end
 
+    def rename_state(old_state_name, new_state_name)
+      old_state = @states[old_state_name]
+      @states[new_state_name] = old_state
+      @states.delete(old_state)
+
+      @initial = new_state_name if @initial == old_state_name
+    end
+
     def to_h
       return {
         initial: @initial,
