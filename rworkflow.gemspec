@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.authors     = ["barcoo"]
   s.email       = ["roots@checkitmobile.com"]
   s.homepage    = "http://www.barcoo.com"
-  s.summary     = "TODO: Summary of Rworkflow."
-  s.description = "TODO: Description of Rworkflow."
+  s.summary     = "TBC: Summary of Rworkflow."
+  s.description = "TBC: Description of Rworkflow."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
