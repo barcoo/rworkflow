@@ -7,9 +7,9 @@ require "rworkflow/version"
 Gem::Specification.new do |s|
   s.name        = "rworkflow"
   s.version     = Rworkflow::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
+  s.authors     = ["barcoo"]
+  s.email       = ["roots@checkitmobile.com"]
+  s.homepage    = "http://www.barcoo.com"
   s.summary     = "TODO: Summary of Rworkflow."
   s.description = "TODO: Description of Rworkflow."
   s.license     = "MIT"
