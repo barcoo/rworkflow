@@ -269,8 +269,8 @@ module Rworkflow
       return value
     end
 
-    def incr(key)
-      return @flow_data.incr(key)
+    def incr(key, value = 1)
+      return @flow_data.incrby(key, value)
     end
 
     def push(objects, state)
