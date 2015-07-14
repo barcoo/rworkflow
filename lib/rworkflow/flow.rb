@@ -153,9 +153,9 @@ module Rworkflow
       terminate if finished?
     end
 
-    def list_objects(state_name)
+    def list_objects(state_name, limit = -1)
       list = get_list(state_name)
-      return list.get(0).map {|object| YAML.load(object)}
+      return list.get(0, limit).map {|object| YAML.load(object)}
     end
 
     def get_state_list(state_name)
