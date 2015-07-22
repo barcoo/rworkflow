@@ -91,7 +91,7 @@ module Rworkflow
       if counters.present?
         counters = begin
           YAML.load(counters)
-        rescue Exception => e
+        rescue => e
           Rails.logger.error("Error loading stored flow counters: #{e.message}")
           nil
         end
