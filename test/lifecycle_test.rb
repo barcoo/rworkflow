@@ -66,6 +66,33 @@ module Rworkflow
       assert_equal '3', lifecycle_one.transition('2', :finish)
     end
 
+    def test_insert
+      to_insert = Rworkflow::Lifecycle.new do |cycle|
+        cycle.initial = :autonomists
+        cycle.state(:autonomists) do |state|
+          state.transition :left, :lefterer
+          state.transition :right, :righterer
+        end
+      end
+
+      test_lc = Rworkflow::Lifecycle.new do |cycle|
+          cycle.initial = :initial
+
+          cycle.state(:initial) do |state|
+            state.transition :left, :anarchists
+            state.transition :right, :theocrats
+            state.transition :confused, :democracy
+          end
+
+          cycle.state(:anarchists)
+          cycle.state(:theocrats)
+          cycle.state(:democracy)
+        end
+      end
+
+      result = test_lc.insert(to_insert, )
+    end
+
     class LCFactory
       def self.simple_lifecycle(state_name, transition, cardinality = 1, priority=nil)
         return Rworkflow::Lifecycle.new do |cycle|
