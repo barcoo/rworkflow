@@ -59,7 +59,11 @@ module Rworkflow
       return if paused? || num_objects < 1 || self.class.terminal?(state_name) || gated?(state_name)
       state = @lifecycle.states[state_name]
       worker_class = begin
-        state.worker_class.constantize
+        if state.worker_class.is_a?(String)
+          state.worker_class.constantize
+        else
+          state.worker_class
+        end
       rescue NameError => _
         Rails.logger.error("Trying to push to a non existent worker class #{state_name} in workflow #{@id}")
         nil
