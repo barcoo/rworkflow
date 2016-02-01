@@ -57,25 +57,25 @@ module Rworkflow
 
     def create_jobs(state_name, num_objects)
       return if paused? || num_objects < 1 || self.class.terminal?(state_name) || gated?(state_name)
+      state = @lifecycle.states[state_name]
       worker_class = begin
-        state_name.constantize
+        state.worker_class.constantize
       rescue NameError => _
         Rails.logger.error("Trying to push to a non existent worker class #{state_name} in workflow #{@id}")
         nil
       end
 
       if worker_class.present?
-        state = @lifecycle.states[state_name]
         cardinality = get_state_cardinality(state_name)
 
         if state.policy == State::STATE_POLICY_WAIT
-          amount = ( (num_objects + get_state_list(state_name).size) / cardinality.to_f).floor
+          amount = ((num_objects + get_state_list(state_name).size) / cardinality.to_f).floor
         else
           amount = (num_objects / cardinality.to_f).ceil
         end
 
         state_priority = self.priority || state.priority
-        amount.times { worker_class.enqueue_job_with_priority(state_priority, @id) }
+        amount.times { worker_class.enqueue_job_with_priority(state_priority, @id, state_name) }
       end
     end
 
@@ -155,8 +155,9 @@ module Rworkflow
 
             if klass.present? && klass <= Rworkflow::Worker
               id = job.args.first
+              state_name = jobs.args.second
               state_map = flow_map.fetch(id, {})
-              state_map[job.klass] = state_map.fetch(job.klass, 0) + 1
+              state_map[state_name] = state_map.fetch(state_name, 0) + 1
               flow_map[id] = state_map
             end
           end
