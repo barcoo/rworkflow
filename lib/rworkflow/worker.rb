@@ -7,26 +7,27 @@ module Rworkflow
 
     sidekiq_options queue: :mysql2
 
-    def perform(id)
+    def perform(id, state_name)
       @workflow = self.class.load_workflow(id)
+      @state_name = state_name
       if @workflow.present?
         if !@workflow.paused?
-          @workflow.fetch(self.jid, self.class.name) do |objects|
+          @workflow.fetch(self.jid, state_name) do |objects|
             process(objects) if objects.present?
           end
         end
       end
     rescue Exception => e
-      Rails.logger.error("Exception produced on #{self.class.name} for flow #{id} on perform: #{e.message}\n#{e.backtrace}")
+      Rails.logger.error("Exception produced on #{state_name} for flow #{id} on perform: #{e.message}\n#{e.backtrace}")
       raise e
     end
 
     def transition(to_state, objects)
-      @workflow.transition(self.class.name, to_state, objects)
+      @workflow.transition(state_name, to_state, objects)
     end
 
     def push_back(objects)
-      @workflow.push(objects, self.class.name)
+      @workflow.push(objects, state_name)
     end
 
     def process(objects)
