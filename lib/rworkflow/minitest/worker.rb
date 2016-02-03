@@ -3,17 +3,15 @@ module Rworkflow
   class Worker
     def initialize(*args)
       super
-      @__test_results = Hash.new { |hash, key| hash[key] = [] }
-      @workflow = Flow.new(self.class.name)
-      @state_name = self.class.name
+      @__pushed_back = []
     end
 
-    def transition(to_state, objects)
-      @__test_results[to_state].concat(objects)
+    def pushed_back
+      return @__pushed_back
     end
 
     def push_back(objects)
-      @__test_results[@state_name || self.class.name].concat(objects)
+      @__pushed_back.concat(objects)
     end
   end
 end
