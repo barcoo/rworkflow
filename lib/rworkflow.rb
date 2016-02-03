@@ -4,7 +4,6 @@ require 'rworkflow/state'
 require 'rworkflow/state_error'
 require 'rworkflow/lifecycle'
 require 'rworkflow/sidekiq_flow'
-require 'rworkflow/test_case'
 require 'rworkflow/transition_error'
 require 'rworkflow/worker'
 
