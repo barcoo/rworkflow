@@ -1,5 +1,5 @@
 module Rworkflow
-  class State
+  class SidekiqState
     attr_accessor :worker_class
 
     def initialize(worker_class, *args)
