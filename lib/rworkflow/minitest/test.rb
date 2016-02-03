@@ -32,9 +32,21 @@ module Rworkflow
         worker.instance_variable_set(:@workflow, workflow)
         worker.instance_variable_set(:@state_name, name)
 
+        workflow.extend(WorkerUnitTestFlow)
+
         yield(workflow) if block_given?
 
         return worker
+      end
+    end
+
+    module WorkerUnitTestFlow
+      def transition(_, name, objects)
+        push(objects, name)
+      end
+
+      def terminal?(name)
+        return true
       end
     end
   end
