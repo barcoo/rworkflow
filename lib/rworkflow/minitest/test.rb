@@ -24,10 +24,11 @@ module Rworkflow
       # @params [Hash] options hash
       # @option [Class] :flow workflow class to instantiate; defaults to SidekiqFlow
       # @option [Class] :name the state name
-      def rworkflow_worker(worker_class, flow: ::SidekiqFlow, name: nil)
+      def rworkflow_worker(worker_class, flow: ::SidekiqFlow, name: nil, meta: {})
         name ||= worker_class.name
         worker = worker_class.new
         workflow = flow.new(name)
+        meta.each { |key, value| workflow.set(key, value) }
 
         worker.instance_variable_set(:@workflow, workflow)
         worker.instance_variable_set(:@state_name, name)
@@ -37,7 +38,7 @@ module Rworkflow
 
         yield(workflow) if block_given?
 
-        return worker
+        return worker, workflow
       end
     end
 
