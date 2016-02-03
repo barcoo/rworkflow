@@ -4,6 +4,8 @@ module Rworkflow
     def initialize(*args)
       super
       @__test_results = Hash.new { |hash, key| hash[key] = [] }
+      @workflow = Flow.new(self.class.name)
+      @state_name = self.class.name
     end
 
     def transition(to_state, objects)
