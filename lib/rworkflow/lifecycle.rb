@@ -1,7 +1,7 @@
 module Rworkflow
   class Lifecycle
     attr_reader :states
-    attr_accessor :initial, :default
+    attr_accessor :initial, :default, :state_class, :state_options
 
     CARDINALITY_ALL_STARTED = :all_started # Indicates a cardinality equal to the jobs pushed at the start of the workflow
 
@@ -11,15 +11,17 @@ module Rworkflow
       policy: State::STATE_POLICY_NO_WAIT
     }
 
-    def initialize(&block)
+    def initialize(state_class: State, state_options: {})
+      @state_options = DEFAULT_STATE_OPTIONS.merge(state_options)
+      @state_class = state_class
       @states = {}
       yield(self) if block_given?
     end
 
-    def state(name, options = {}, &block)
-      options = DEFAULT_STATE_OPTIONS.merge(options)
+    def state(name, options = {})
+      options = @state_options.merge(options)
+      new_state = @state_class.new(**options)
 
-      new_state = State.new(options[:cardinality], options[:priority], options[:policy])
       yield(new_state) if block_given?
 
       @states[name] = new_state
@@ -56,6 +58,8 @@ module Rworkflow
       return {
         initial: @initial,
         default: @default,
+        state_class: @state_class,
+        state_options: @state_options,
         states: Hash[@states.map do |name, state|
           [name, state.to_h]
         end]
@@ -84,11 +88,14 @@ module Rworkflow
 
       def unserialize(hash)
         return self.new do |lf|
-          hash[:states].each do |name, state_hash|
-            lf.states[name] = State.unserialize(state_hash)
-          end
           lf.initial = hash[:initial]
           lf.default = hash[:default]
+          lf.state_options = hash[:state_options]
+          lf.state_class = hash[:state_class]
+
+          hash[:states].each do |name, state_hash|
+            lf.states[name] = lf.state_class.unserialize(state_hash)
+          end
         end
       end
     end

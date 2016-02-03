@@ -10,7 +10,7 @@ module Rworkflow
     attr_accessor :cardinality, :priority, :policy
     attr_reader :transitions
 
-    def initialize(cardinality = DEFAULT_CARDINALITY, priority = DEFAULT_PRIORITY, policy = STATE_POLICY_NO_WAIT)
+    def initialize(cardinality: DEFAULT_CARDINALITY, priority: DEFAULT_PRIORITY, policy: STATE_POLICY_NO_WAIT, **options)
       @cardinality = cardinality
       @priority = priority
       @policy = policy
@@ -22,7 +22,7 @@ module Rworkflow
       @transitions[name] = to
     end
 
-    def perform(name, default=nil)
+    def perform(name, default = nil)
       to_state = @transitions[name] || default
       raise TransitionError.new(name) if to_state.nil?
       return to_state
@@ -34,7 +34,7 @@ module Rworkflow
       @priority = state.priority
       @policy = state.policy
 
-      @transitions.merge!(state.transitions) do |name, _, transition|
+      @transitions.merge!(state.transitions) do |_, _, transition|
         transition
       end
 
@@ -46,7 +46,7 @@ module Rworkflow
     end
 
     def clone
-      cloned = State.new(@cardinality, @priority, @policy)
+      cloned = self.class.new(@cardinality, @priority, @policy)
       @transitions.each { |from, to| cloned.transition(from, to) }
       return cloned
     end
@@ -91,10 +91,10 @@ module Rworkflow
       end
 
       def unserialize(state_hash)
-        state = self.new(state_hash[:cardinality], state_hash.fetch(:priority, DEFAULT_PRIORITY), state_hash.fetch(:policy, STATE_POLICY_NO_WAIT))
+        state = self.new(**state_hash)
 
         state_hash[:transitions].each do |from, to|
-          state.transition from, to
+          state.transition(from, to)
         end
 
         return state
