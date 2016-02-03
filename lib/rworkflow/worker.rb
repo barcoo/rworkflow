@@ -37,7 +37,7 @@ module Rworkflow
     class << self
       def generate_lifecycle(&block)
         return Rworkflow::Lifecycle.new do |lc|
-          lc.state(self.class.name, &block)
+          lc.state(self.class.name, worker: self.class, &block)
           lc.initial = self.class.name
         end
       end
