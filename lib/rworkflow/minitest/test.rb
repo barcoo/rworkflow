@@ -33,6 +33,7 @@ module Rworkflow
         worker.instance_variable_set(:@state_name, name)
 
         workflow.extend(WorkerUnitTestFlow)
+        workflow.class.extend(WorkerUnitTestFlow::ClassMethods)
 
         yield(workflow) if block_given?
 
@@ -45,8 +46,10 @@ module Rworkflow
         push(objects, name)
       end
 
-      def terminal?(name)
-        return true
+      module ClassMethods
+        def terminal?(name)
+          return true
+        end
       end
     end
   end
