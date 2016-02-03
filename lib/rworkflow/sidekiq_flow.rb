@@ -58,15 +58,15 @@ module Rworkflow
     def create_jobs(state_name, num_objects)
       return if paused? || num_objects < 1 || self.class.terminal?(state_name) || gated?(state_name)
       state = @lifecycle.states[state_name]
-      worker_class = begin
-        if state.worker_class.is_a?(String)
-          state.worker_class.constantize
-        else
-          state.worker_class
+      worker_class = if state.respond_to?(:worker_class)
+        state.worker_class
+      else
+        begin
+          state_name.constantize
+        rescue NameError => _
+          Rails.logger.error("Trying to push to a non existent worker class #{state_name} in workflow #{@id}")
+          nil
         end
-      rescue NameError => _
-        Rails.logger.error("Trying to push to a non existent worker class #{state_name} in workflow #{@id}")
-        nil
       end
 
       if worker_class.present?
