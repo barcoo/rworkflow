@@ -71,7 +71,7 @@ module Rworkflow
       return digraph do
         states.each do |from, state|
           state.transitions.each do |transition, to|
-            edge(from, to).label(transition.to_s)
+            edge(from.to_s, to.to_s).label(transition.to_s)
           end
         end
       end
