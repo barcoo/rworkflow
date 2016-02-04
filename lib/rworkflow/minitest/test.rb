@@ -34,7 +34,9 @@ module Rworkflow
         worker.instance_variable_set(:@state_name, name)
 
         workflow.extend(WorkerUnitTestFlow)
-        workflow.singleton_class.extend(WorkerUnitTestFlow::ClassMethods)
+        if defined?(flexmock)
+          flexmock(workflow.class).should_receive(:terminal?).and_return(true)
+        end
 
         yield(workflow) if block_given?
 
@@ -45,12 +47,6 @@ module Rworkflow
     module WorkerUnitTestFlow
       def transition(_, name, objects)
         push(objects, name)
-      end
-
-      module ClassMethods
-        def terminal?(name)
-          return true
-        end
       end
     end
   end
