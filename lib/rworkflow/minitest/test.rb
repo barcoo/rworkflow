@@ -34,7 +34,7 @@ module Rworkflow
         worker.instance_variable_set(:@state_name, name)
 
         workflow.extend(WorkerUnitTestFlow)
-        workflow.class.extend(WorkerUnitTestFlow::ClassMethods)
+        workflow.singleton_class.extend(WorkerUnitTestFlow::ClassMethods)
 
         yield(workflow) if block_given?
 
