@@ -10,7 +10,7 @@ module Rworkflow
     def perform(id, state_name)
       @workflow = self.class.load_workflow(id)
       @state_name = state_name
-      if @workflow.present?
+      if !@workflow.nil?
         if !@workflow.paused?
           @workflow.fetch(self.jid, state_name) do |objects|
             process(objects) if objects.present?
@@ -44,7 +44,7 @@ module Rworkflow
 
       def load_workflow(id)
         workflow = Flow.load(id)
-        if workflow.present? && workflow.valid?
+        if !workflow.nil? && workflow.valid?
           return workflow
         end
 

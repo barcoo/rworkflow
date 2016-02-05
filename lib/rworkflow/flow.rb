@@ -22,9 +22,9 @@ module Rworkflow
 
     def load_lifecycle
       serialized = @storage.get(:lifecycle)
-      if serialized.present?
+      if !serialized.nil?
         structure = self.class.serializer.load(serialized)
-        @lifecycle = Rworkflow::Lifecycle.unserialize(structure) if structure.present?
+        @lifecycle = Rworkflow::Lifecycle.unserialize(structure) if !structure.nil?
       end
     end
     private :load_lifecycle
@@ -55,7 +55,7 @@ module Rworkflow
     end
 
     def started?
-      return self.get(:start_time).present?
+      return !self.get(:start_time).nil?
     end
 
     def name
@@ -79,7 +79,7 @@ module Rworkflow
     end
 
     def valid?
-      return @lifecycle.present?
+      return !@lifecycle.nil?
     end
 
     def count(state)
@@ -88,7 +88,7 @@ module Rworkflow
 
     def get_counters
       counters = @storage.get(:counters)
-      if counters.present?
+      if !counters.nil?
         counters = begin
           self.class.serializer.load(counters)
         rescue => e
@@ -123,7 +123,7 @@ module Rworkflow
     def fetch(fetcher_id, state_name, &block)
       @processing.set(fetcher_id, 1)
       list = get_state_list(state_name)
-      if list.present?
+      if !list.nil?
         failed = []
         cardinality = @lifecycle.states[state_name].cardinality
         cardinality = get(:start_count).to_i if cardinality == Rworkflow::Lifecycle::CARDINALITY_ALL_STARTED
@@ -140,7 +140,7 @@ module Rworkflow
           end.compact
           @processing.set(fetcher_id, objects.size)
 
-          if failed.present?
+          if !failed.nil?
             push(failed, STATE_FAILED)
             Rails.logger.error("Failed to parse #{failed.size} in workflow #{self.id} for fetcher id #{fetcher_id} at state #{state_name}")
           end
@@ -162,7 +162,7 @@ module Rworkflow
       list = nil
       state = @lifecycle.states[state_name]
 
-      if state.present?
+      if !state.nil?
         list = get_list(state_name)
       else
         Rails.logger.error("Tried accessing invalid state #{state_name} for workflow #{id}")
@@ -218,7 +218,7 @@ module Rworkflow
         nil
       end
 
-      if to_state.present?
+      if !to_state.nil?
         push(objects, to_state)
         log(from_state, name, objects.size)
       end
@@ -386,14 +386,14 @@ module Rworkflow
       def all
         return registry.all.select do |id|
           klass = read_flow_class(id)
-          klass.present? && klass <= self
+          !klass.nil? && klass <= self
         end.map { |id| load(id) }
       end
 
       def load(id, klass = nil)
         workflow = nil
 
-        klass = read_flow_class(id) if klass.nil?
+        klass = read_flow_class(id) if !klass.nil?
         workflow = klass.new(id) if klass.respond_to?(:new)
         return workflow
       end
@@ -406,7 +406,7 @@ module Rworkflow
         rescue NameError => _
           Rails.logger.warn("Unknown flow class for workflow id #{id}")
           nil
-        end if raw_class.present?
+        end if !raw_class.nil?
         return klass
       end
       private :read_flow_class

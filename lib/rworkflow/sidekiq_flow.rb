@@ -69,7 +69,7 @@ module Rworkflow
         end
       end
 
-      if worker_class.present?
+      if !worker_class.nil?
         cardinality = get_state_cardinality(state_name)
 
         if state.policy == State::STATE_POLICY_WAIT
@@ -157,7 +157,7 @@ module Rworkflow
               nil
             end
 
-            if klass.present? && klass <= Rworkflow::Worker
+            if !klass.nil? && klass <= Rworkflow::Worker
               id = job.args.first
               state_name = jobs.args.second
               state_map = flow_map.fetch(id, {})
