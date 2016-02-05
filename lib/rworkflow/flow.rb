@@ -393,7 +393,7 @@ module Rworkflow
       def load(id, klass = nil)
         workflow = nil
 
-        klass = read_flow_class(id) if !klass.nil?
+        klass = read_flow_class(id) if klass.nil?
         workflow = klass.new(id) if klass.respond_to?(:new)
         return workflow
       end
@@ -407,6 +407,7 @@ module Rworkflow
           Rails.logger.warn("Unknown flow class for workflow id #{id}")
           nil
         end if !raw_class.nil?
+
         return klass
       end
       private :read_flow_class
