@@ -140,7 +140,7 @@ module Rworkflow
           end.compact
           @processing.set(fetcher_id, objects.size)
 
-          if !failed.nil?
+          if !failed.empty?
             push(failed, STATE_FAILED)
             Rails.logger.error("Failed to parse #{failed.size} in workflow #{self.id} for fetcher id #{fetcher_id} at state #{state_name}")
           end
