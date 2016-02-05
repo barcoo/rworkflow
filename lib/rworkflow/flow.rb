@@ -23,7 +23,7 @@ module Rworkflow
     def load_lifecycle
       serialized = @storage.get(:lifecycle)
       if serialized.present?
-        structure = YAML.load(serialized)
+        structure = self.class.serializer.load(serialized)
         @lifecycle = Rworkflow::Lifecycle.unserialize(structure) if structure.present?
       end
     end
@@ -31,7 +31,7 @@ module Rworkflow
 
     def lifecycle=(new_lifecycle)
       @lifecycle = new_lifecycle
-      @storage.set(:lifecycle, @lifecycle.serialize.to_yaml)
+      @storage.set(:lifecycle, self.class.serializer.dump(@lifecycle.serialize))
     end
 
     def finished?
@@ -90,7 +90,7 @@ module Rworkflow
       counters = @storage.get(:counters)
       if counters.present?
         counters = begin
-          YAML.load(counters)
+          self.class.serializer.load(counters)
         rescue => e
           Rails.logger.error("Error loading stored flow counters: #{e.message}")
           nil
@@ -132,7 +132,7 @@ module Rworkflow
         if !raw_objects.empty?
           objects = raw_objects.map do |raw_object|
             begin
-              YAML.load(raw_object)
+              self.class.serializer.load(raw_object)
             rescue StandardError => _
               failed << raw_object
               nil
@@ -155,7 +155,7 @@ module Rworkflow
 
     def list_objects(state_name, limit = -1)
       list = get_list(state_name)
-      return list.get(0, limit).map {|object| YAML.load(object)}
+      return list.get(0, limit).map {|object| self.class.serializer.load(object)}
     end
 
     def get_state_list(state_name)
@@ -181,7 +181,7 @@ module Rworkflow
           if self.public?
             counters = get_counters!
             counters[:processing] = 0 # Some worker might have increased the processing flag at that time even if there is no more jobs to be done
-            @storage.setnx(:counters, counters.to_yaml)
+            @storage.setnx(:counters, self.class.serializer.dump(counters))
             states_cleanup
           else
             self.cleanup
@@ -259,12 +259,12 @@ module Rworkflow
     end
 
     def set(key, value)
-      @flow_data.set(key, value.to_yaml)
+      @flow_data.set(key, self.class.serializer.dump(value))
     end
 
     def get(key, default = nil)
       value = @flow_data.get(key)
-      value = if value.nil? then default else YAML.load(value) end
+      value = if value.nil? then default else self.class.serializer.load(value) end
 
       return value
     end
@@ -279,7 +279,7 @@ module Rworkflow
       return 0 if objects.empty?
 
       list = get_list(state)
-      list.rpush(objects.map(&:to_yaml))
+      list.rpush(objects.map { |object| self.class.serializer.dump(object) })
 
       return objects.size
     end
@@ -433,6 +433,10 @@ module Rworkflow
 
       def registry
         RedisRds::Set.new(WORKFLOW_REGISTRY)
+      end
+
+      def serializer
+        YAML
       end
     end
   end
