@@ -56,11 +56,10 @@ module Rworkflow
       if parent_class.nil? || parent_class == Flow
         ids = zset.range(from, to, order: order)
       else
-        ids = zset.range(0, -1, order: order)
-        ids.select! do |id|
+        ids = zset.range(0, -1, order: order).select do |id|
           klass = Flow.read_flow_class(id)
           !klass.nil? && klass <= parent_class
-        end.slice!(from..to)
+        end.slice(from..to)
       end
 
       return ids
