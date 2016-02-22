@@ -24,25 +24,25 @@ module Rworkflow
       key = flow.created_at.to_i
 
       if flow.public?
-        @public.add(key, flow)
+        @public.add(key, flow.id)
       else
-        @private.add(key, flow)
+        @private.add(key, flow.id)
       end
     end
 
     def remove(flow)
       if flow.public?
-        @public.remove(flow)
+        @public.remove(flow.id)
       else
-        @private.remove(flow)
+        @private.remove(flow.id)
       end
     end
 
     def include?(flow)
       if flow.public?
-        @public.include?(flow)
+        @public.include?(flow.id)
       else
-        @private.include?(flow)
+        @private.include?(flow.id)
       end
     end
 
