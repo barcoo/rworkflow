@@ -13,11 +13,11 @@ module Rworkflow
     end
 
     def public_flows(options = {})
-      return get(@public, options)
+      return get(@public, **options)
     end
 
     def private_flows(options = {})
-      return get(@private, options)
+      return get(@private, **options)
     end
 
     def add(flow)
