@@ -379,15 +379,16 @@ module Rworkflow
         workflow.cleanup
       end
 
-      def get_public_workflows
-        return all.select { |flow| flow.public? }
+      def get_public_workflows(options = {})
+        return registry.public_flows(options).map { |id| load(id) }
       end
 
-      def all
-        return registry.all.select do |id|
-          klass = read_flow_class(id)
-          !klass.nil? && klass <= self
-        end.map { |id| load(id) }
+      def get_private_workflows(options = {})
+        return registry.private_flows(options).map { |id| load(id) }
+      end
+
+      def all(options = {})
+        return registry.all(options).map { |id| load(id) }
       end
 
       def load(id, klass = nil)
@@ -417,11 +418,11 @@ module Rworkflow
       end
 
       def register(workflow)
-        registry.add(workflow.id)
+        registry.add(workflow)
       end
 
       def unregister(workflow)
-        registry.remove(workflow.id)
+        registry.remove(workflow)
       end
 
       def terminal?(state)
@@ -433,7 +434,9 @@ module Rworkflow
       end
 
       def registry
-        RedisRds::Set.new(WORKFLOW_REGISTRY)
+        return @registry ||= begin
+          FlowRegistry.new(Rworkflow::VERSION.to_s)
+        end
       end
 
       def serializer

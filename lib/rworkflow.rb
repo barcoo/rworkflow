@@ -1,4 +1,5 @@
 require 'rworkflow/sidekiq_helper'
+require 'rworkflow/flow_registry'
 require 'rworkflow/flow'
 require 'rworkflow/state'
 require 'rworkflow/state_error'
