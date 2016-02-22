@@ -380,15 +380,15 @@ module Rworkflow
       end
 
       def get_public_workflows(options = {})
-        return registry.public_flows(options).map { |id| load(id) }
+        return registry.public_flows(options.reverse_merge(parent_class: self)).map { |id| load(id) }
       end
 
       def get_private_workflows(options = {})
-        return registry.private_flows(options).map { |id| load(id) }
+        return registry.private_flows(options.reverse_merge(parent_class: self)).map { |id| load(id) }
       end
 
       def all(options = {})
-        return registry.all(options).map { |id| load(id) }
+        return registry.all(options.reverse_merge(parent_class: self)).map { |id| load(id) }
       end
 
       def load(id, klass = nil)
