@@ -411,7 +411,6 @@ module Rworkflow
 
         return klass
       end
-      private :read_flow_class
 
       def registered?(id)
         return registry.include?(id)

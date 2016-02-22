@@ -8,8 +8,24 @@ module Rworkflow
       @private = RedisRds::SortedSet.new("#{@redis_key}:private")
     end
 
-    def all(options = {})
-      return self.public_flows(options) + self.private_flows(options)
+    # Warning: using parent_class forces us to load everything, make this potentially much slower as we have to do the
+    # pagination in the app, not in the db
+    def all(parent_class: nil, **options)
+      # load every ID if we have a parent_class
+      options.merge(from: nil, to: nil) unless parent_class.nil?
+
+      ids = self.public_flows(options) + self.private_flows(options)
+      unless parent_class.nil?
+        from = from.to_i
+        to = to.nil? ? -1 : to.to_i
+
+        ids.select! do |id|
+          klass = Flow.read_flow_class(id)
+          !klass.nil? && klass <= parent_class
+        end.slice!(from..to)
+      end
+
+      return ids
     end
 
     def public_flows(options = {})
