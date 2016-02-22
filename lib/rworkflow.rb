@@ -1,3 +1,4 @@
+require 'rworkflow/version'
 require 'rworkflow/sidekiq_helper'
 require 'rworkflow/flow_registry'
 require 'rworkflow/flow'
