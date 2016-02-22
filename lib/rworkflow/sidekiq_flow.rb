@@ -159,7 +159,7 @@ module Rworkflow
 
             if !klass.nil? && klass <= Rworkflow::Worker
               id = job.args.first
-              state_name = jobs.args.second
+              state_name = job.args.second
               state_map = flow_map.fetch(id, {})
               state_map[state_name] = state_map.fetch(state_name, 0) + 1
               flow_map[id] = state_map
