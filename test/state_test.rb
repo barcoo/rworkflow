@@ -16,84 +16,84 @@ module Rworkflow
       @state.transition('a', 'b')
       @state.transition('b', 'c')
 
-      assert_equal 'b', @state.transitions['a'], "Transition A->B missing."
-      assert_equal 'c', @state.transitions['b'], "Transition B->C missing."
+      assert_equal 'b', @state.transitions['a'], 'Transition A->B missing.'
+      assert_equal 'c', @state.transitions['b'], 'Transition B->C missing.'
     end
 
     def test_perform
       @state.transition('a', 'b')
       @state.transition('b', 'c')
 
-      assert_equal 'b', @state.perform('a'), "Transition A->B missing."
-      assert_equal 'c', @state.perform('b'), "Transition B->C missing."
+      assert_equal 'b', @state.perform('a'), 'Transition A->B missing.'
+      assert_equal 'c', @state.perform('b'), 'Transition B->C missing.'
     end
 
     def test_equality
-      stateB = State.new
+      other_state = State.new
 
-      assert_equal @state, stateB, "State A and B should be equal."
+      assert_equal @state, other_state, 'State A and B should be equal.'
 
-      stateB.policy = State::STATE_POLICY_WAIT
-      assert_not_equal @state, stateB, "State A != B: different policies!"
+      other_state.policy = State::STATE_POLICY_WAIT
+      assert_not_equal @state, other_state, 'State A != B: different policies!'
 
-      stateB = State.new
-      stateB.priority = :high
-      assert_not_equal @state, stateB, "State A != B: different priorities!"
+      other_state = State.new
+      other_state.priority = :high
+      assert_not_equal @state, other_state, 'State A != B: different priorities!'
 
-      stateB = State.new
-      stateB.cardinality = 32
-      assert_not_equal @state, stateB, "State A != B: different cardinalities!"
+      other_state = State.new
+      other_state.cardinality = 32
+      assert_not_equal @state, other_state, 'State A != B: different cardinalities!'
 
-      stateB = State.new
-      stateB.transition('a', 'b')
-      stateB.transition('b', 'c')
+      other_state = State.new
+      other_state.transition('a', 'b')
+      other_state.transition('b', 'c')
       @state.transition('a', 'b')
       @state.transition('b', 'c')
-      assert_equal @state, stateB, "State A === B: same transitions!"
+      assert_equal @state, other_state, 'State A === B: same transitions!'
 
-      stateB.transition('c', 'd')
-      assert_not_equal @state, stateB, "State A != B: different transitions!"
+      other_state.transition('c', 'd')
+      assert_not_equal @state, other_state, 'State A != B: different transitions!'
     end
 
     def test_serialization
-      stateB = State.new
-      stateB.transition('a', 'b')
-      stateB.transition('b', 'c')
-      assert_not_equal @state.serialize, stateB.serialize, "State A should not equal B: serialization failed"
+      other_state = State.new
+      other_state.transition('a', 'b')
+      other_state.transition('b', 'c')
+      assert_not_equal @state.serialize, other_state.serialize, 'State A should not equal B: serialization failed'
 
       @state.transition('a', 'b')
       @state.transition('b', 'c')
-      assert_equal @state.serialize, stateB.serialize, "State A should equal B: serialization failed"
+      assert_equal @state.serialize, other_state.serialize, 'State A should equal B: serialization failed'
     end
 
     def test_clone
       cloned = @state.clone
-      assert_equal @state, cloned, "Original and cloned states should be equal"
-      assert !@state.equal?(cloned), "Original and cloned states should not be the same object"
+      assert_equal @state, cloned, 'Original and cloned states should be equal'
+      assert !@state.equal?(cloned), 'Original and cloned states should not be the same object'
 
       @state.transition('a', 'b')
       @state.policy = State::STATE_POLICY_WAIT
       @state.cardinality = 2
       @state.priority = :high
       cloned = @state.clone
-      assert_equal @state, cloned, "Original and cloned states should be equal"
-      assert !@state.equal?(cloned), "Original and cloned states should not be the same object"
+      assert_equal @state, cloned, 'Original and cloned states should be equal'
+      assert !@state.equal?(cloned), 'Original and cloned states should not be the same object'
     end
 
     def test_merge
-      stateB = State.new(2, :high, State::STATE_POLICY_WAIT)
-      merged = @state.merge(stateB)
-      assert_equal merged, stateB, "Merged state should be equal to state B"
+      other_state = State.new(cardinality: 2, priority: :high, policy: State::STATE_POLICY_WAIT)
+      merged = @state.merge(other_state)
+      assert_equal merged, other_state, 'Merged state should be equal to state B'
 
-      stateB.transition('a', 'b')
-      stateB.transition('b', 'c')
+      other_state.transition('a', 'b')
+      other_state.transition('b', 'c')
       @state.transition('a', 'c')
       @state.transition('c', 'd')
 
-      expected_state = stateB.clone
+      expected_state = other_state.clone
       expected_state.transition('c', 'd')
-      merged = @state.merge(stateB)
-      assert_equal merged, expected_state, "Merged state should have same properties as B plus additional transition C->D"
+      merged = @state.merge(other_state)
+      assert_equal merged, expected_state, 'Merged state should have same properties as B plus additional transition C->D'
     end
   end
 end

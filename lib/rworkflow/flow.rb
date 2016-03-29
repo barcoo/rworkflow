@@ -2,11 +2,11 @@ module Rworkflow
   class Flow
     STATE_SUCCESSFUL = :successful
     STATE_FAILED = :failed
-    STATES_TERMINAL = [STATE_FAILED, STATE_SUCCESSFUL]
-    STATES_FAILED = [STATE_FAILED]
+    STATES_TERMINAL = [STATE_FAILED, STATE_SUCCESSFUL].freeze
+    STATES_FAILED = [STATE_FAILED].freeze
 
-    REDIS_NS = 'flow'
-    WORKFLOW_REGISTRY = "#{REDIS_NS}:__registry"
+    REDIS_NS = 'flow'.freeze
+    WORKFLOW_REGISTRY = "#{REDIS_NS}:__registry".freeze
 
     attr_accessor :id
     attr_reader :lifecycle
@@ -14,17 +14,19 @@ module Rworkflow
     def initialize(id)
       @id = id
       @redis_key = "#{REDIS_NS}:#{id}"
+
       @storage = RedisRds::Hash.new(@redis_key)
       @flow_data = RedisRds::Hash.new("#{@redis_key}__data")
       @processing = RedisRds::Hash.new("#{@redis_key}__processing")
+
       load_lifecycle
     end
 
     def load_lifecycle
       serialized = @storage.get(:lifecycle)
-      if !serialized.nil?
-        structure = self.class.serializer.load(serialized)
-        @lifecycle = Rworkflow::Lifecycle.unserialize(structure) if !structure.nil?
+      unless serialized.nil?
+        raw = self.class.serializer.load(serialized)
+        @lifecycle = Rworkflow::Lifecycle.unserialize(raw) unless raw.nil?
       end
     end
     private :load_lifecycle
@@ -35,7 +37,7 @@ module Rworkflow
     end
 
     def finished?
-      return false unless self.started?
+      return false unless started?
       total = get_counters.reduce(0) do |sum, pair|
         self.class.terminal?(pair[0]) ? sum : (sum + pair[1].to_i)
       end
@@ -51,27 +53,27 @@ module Rworkflow
     end
 
     def created_at
-      return @created_at ||= begin Time.at(self.get(:created_at, 0)) end
+      return @created_at ||= begin Time.at(get(:created_at, 0)) end
     end
 
     def started?
-      return !self.get(:start_time).nil?
+      return !get(:start_time).nil?
     end
 
     def name
-      return self.get(:name, @id)
+      return get(:name, @id)
     end
 
     def name=(name)
-      return self.set(:name, name)
+      return set(:name, name)
     end
 
     def start_time
-      return Time.at(self.get(:start_time, 0))
+      return Time.at(get(:start_time, 0))
     end
 
     def finish_time
-      return Time.at(self.get(:finish_time, 0))
+      return Time.at(get(:finish_time, 0))
     end
 
     def expected_duration
@@ -120,16 +122,16 @@ module Rworkflow
     end
     private :get_counters!
 
-    def fetch(fetcher_id, state_name, &block)
+    def fetch(fetcher_id, state_name)
       @processing.set(fetcher_id, 1)
       list = get_state_list(state_name)
-      if !list.nil?
+      unless list.nil?
         failed = []
         cardinality = @lifecycle.states[state_name].cardinality
-        cardinality = get(:start_count).to_i if cardinality == Rworkflow::Lifecycle::CARDINALITY_ALL_STARTED
-        force_list_complete = @lifecycle.states[state_name].policy == Rworkflow::State::STATE_POLICY_WAIT
+        cardinality = get(:start_count).to_i if cardinality == Lifecycle::CARDINALITY_ALL_STARTED
+        force_list_complete = @lifecycle.states[state_name].policy == State::STATE_POLICY_WAIT
         raw_objects = list.lpop(cardinality, force_list_complete)
-        if !raw_objects.empty?
+        unless raw_objects.empty?
           objects = raw_objects.map do |raw_object|
             begin
               self.class.serializer.load(raw_object)
@@ -140,9 +142,9 @@ module Rworkflow
           end.compact
           @processing.set(fetcher_id, objects.size)
 
-          if !failed.empty?
+          unless failed.empty?
             push(failed, STATE_FAILED)
-            Rails.logger.error("Failed to parse #{failed.size} in workflow #{self.id} for fetcher id #{fetcher_id} at state #{state_name}")
+            Rails.logger.error("Failed to parse #{failed.size} in workflow #{@id} for fetcher id #{fetcher_id} at state #{state_name}")
           end
 
           yield(objects) if block_given?
@@ -293,11 +295,11 @@ module Rworkflow
     def cleanup
       return if Rails.env.test?
       states_cleanup
+      logger.delete
       @processing.delete
-      @storage.delete
-      @flow_data.delete
-      logger.delete if logging?
       self.class.unregister(self)
+      @flow_data.delete
+      @storage.delete
     end
 
     def states_cleanup
@@ -308,8 +310,8 @@ module Rworkflow
 
     def start(objects)
       objects = Array.wrap(objects)
-      self.set(:start_time, Time.now.to_i)
-      self.set(:start_count, objects.size)
+      set(:start_time, Time.now.to_i)
+      set(:start_count, objects.size)
       push(objects, lifecycle.initial)
       log(lifecycle.initial, 'initial', objects.size)
     end
@@ -349,20 +351,20 @@ module Rworkflow
     end
 
     def public?
-      return @public ||= begin self.get(:public, false) end
+      return @public ||= begin get(:public, false) end
     end
 
     class << self
       def create(lifecycle, name = '', options = {})
         id = generate_id(name)
-        workflow = self.new(id)
+        workflow = new(id)
         workflow.name = name
         workflow.lifecycle = lifecycle
         workflow.set(:created_at, Time.now.to_i)
         workflow.set(:public, options.fetch(:public, false))
         workflow.set(:logging, options.fetch(:logging, true))
 
-        self.register(workflow)
+        register(workflow)
 
         return workflow
       end
@@ -370,12 +372,12 @@ module Rworkflow
       def generate_id(workflow_name)
         now = Time.now.to_f
         random = Random.new(now)
-        return "#{self.name}__#{workflow_name}__#{(Time.now.to_f * 1000).to_i}__#{random.rand(now).to_i}"
+        return "#{name}__#{workflow_name}__#{(Time.now.to_f * 1000).to_i}__#{random.rand(now).to_i}"
       end
       private :generate_id
 
       def cleanup(id)
-        workflow = self.new(id)
+        workflow = new(id)
         workflow.cleanup
       end
 
@@ -412,8 +414,8 @@ module Rworkflow
         return klass
       end
 
-      def registered?(id)
-        return registry.include?(id)
+      def registered?(workflow)
+        return registry.include?(workflow)
       end
 
       def register(workflow)

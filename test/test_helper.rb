@@ -1,25 +1,23 @@
 # Configure Rails Environment
-ENV["RAILS_ENV"] = "test"
+ENV['RAILS_ENV'] = 'test'
 
-require File.expand_path("../dummy/config/environment.rb",  __FILE__)
-require "rails/test_help"
+require File.expand_path('../dummy/config/environment.rb', __FILE__)
+require 'rails/test_help'
 
 Rails.backtrace_cleaner.remove_silencers!
 
-RedisRds.configure({
-    :host => "localhost",
-    :db => 1,
-    :port => 6379,
-    :timeout => 30,
-    :thread_safe => true,
-    :namespace => "testns"
-  }
+connection = Redis.new(
+  host: 'localhost',
+  db: 1,
+  port: 6379,
+  timeout: 30,
+  thread_safe: true
+)
+
+RedisRds.configure(
+  connection: connection,
+  namespace: 'testns'
 )
 
 # Load support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
-
-# Load fixtures from the engine
-if ActiveSupport::TestCase.method_defined?(:fixture_path=)
-  ActiveSupport::TestCase.fixture_path = File.expand_path("../fixtures", __FILE__)
-end

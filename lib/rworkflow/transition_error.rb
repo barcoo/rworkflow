@@ -1,4 +1,4 @@
-require 'rworkflow/transition_error'
+require 'rworkflow/state_error'
 
 module Rworkflow
   class TransitionError < StateError

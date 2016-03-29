@@ -10,7 +10,7 @@ module Rworkflow
     attr_accessor :cardinality, :priority, :policy
     attr_reader :transitions
 
-    def initialize(cardinality: DEFAULT_CARDINALITY, priority: DEFAULT_PRIORITY, policy: STATE_POLICY_NO_WAIT, **options)
+    def initialize(cardinality: DEFAULT_CARDINALITY, priority: DEFAULT_PRIORITY, policy: STATE_POLICY_NO_WAIT, **_)
       @cardinality = cardinality
       @priority = priority
       @policy = policy
@@ -46,7 +46,7 @@ module Rworkflow
     end
 
     def clone
-      cloned = self.class.new(@cardinality, @priority, @policy)
+      cloned = self.class.new(cardinality: @cardinality, priority: @priority, policy: @policy)
       @transitions.each { |from, to| cloned.transition(from, to) }
       return cloned
     end

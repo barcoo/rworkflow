@@ -11,3 +11,4 @@ test/dummy/.sass-cache
 .tags_sorted_by_file
 .rvmrc
 Gemfile.lock
+.byebug_history

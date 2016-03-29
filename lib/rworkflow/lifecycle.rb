@@ -15,6 +15,7 @@ module Rworkflow
       @state_options = DEFAULT_STATE_OPTIONS.merge(state_options)
       @state_class = state_class
       @states = {}
+      @default = nil
       yield(self) if block_given?
     end
 
@@ -29,13 +30,13 @@ module Rworkflow
 
     def transition(from, name)
       from_state = @states[from]
-      raise StateError.new(from) if from_state.nil?
+      fail(StateError, from) if from_state.nil?
 
-      return from_state.perform(name, self.default)
+      return from_state.perform(name, @default)
     end
 
     def concat!(from, name, lifecycle, &state_merge_handler)
-      state_merge_handler ||= -> (name, original_state, concat_state) do
+      state_merge_handler ||= lambda do |_, original_state, concat_state|
         original_state.merge(concat_state)
       end
 
@@ -60,9 +61,7 @@ module Rworkflow
         default: @default,
         state_class: @state_class,
         state_options: @state_options,
-        states: Hash[@states.map do |name, state|
-          [name, state.to_h]
-        end]
+        states: Hash[@states.map { |name, state| [name, state.to_h] }]
       }
     end
 

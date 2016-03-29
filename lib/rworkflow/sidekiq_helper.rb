@@ -2,7 +2,6 @@ require 'sidekiq/api'
 
 module Rworkflow
   module SidekiqHelper
-
     def self.included(klass)
       klass.send :extend,  ClassMethods
       klass.send :include, InstanceMethods
@@ -52,35 +51,34 @@ module Rworkflow
     end
 
     module InstanceMethods
-
     end
 
     # Static methods
-  class << self
-    def configure_server host, port, db
-      Sidekiq.configure_server do |config|
-        config.redis = {:url => "redis://#{host}:#{port}/#{db}", :namespace => 'sidekiq'}
-        config.server_middleware do |chain|
-          chain.add SidekiqServerMiddleware
+    class << self
+      def configure_server host, port, db
+        Sidekiq.configure_server do |config|
+          config.redis = {:url => "redis://#{host}:#{port}/#{db}", :namespace => 'sidekiq'}
+          config.server_middleware do |chain|
+            chain.add SidekiqServerMiddleware
+          end
         end
       end
-    end
 
-    def configure_client host, port, db
-      Sidekiq.configure_client do |config|
-        config.redis = {:url => "redis://#{host}:#{port}/#{db}", :namespace => 'sidekiq'}
+      def configure_client host, port, db
+        Sidekiq.configure_client do |config|
+          config.redis = {:url => "redis://#{host}:#{port}/#{db}", :namespace => 'sidekiq'}
+        end
+      end
+
+      def get_queue_sizes
+        stats = Sidekiq::Stats.new
+        return stats.queues
+      end
+
+      def get_queue_sizes_sum
+        stats = Sidekiq::Stats.new
+        return stats.enqueued
       end
     end
-
-    def get_queue_sizes
-      stats = Sidekiq::Stats.new
-      return stats.queues
-    end
-
-    def get_queue_sizes_sum
-      stats = Sidekiq::Stats.new
-      return stats.enqueued
-    end
-   end
   end
 end
