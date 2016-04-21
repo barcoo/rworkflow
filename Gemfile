@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 # Declare your gem's dependencies in rworkflow.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
@@ -10,8 +10,8 @@ gemspec
 # Git. Remember to move these dependencies to your gemspec before releasing
 # your gem to rubygems.org.
 
-gem 'redis_rds', :github => 'barcoo/redis_rds'
-gem 'byebug', :group => [:development, :test]
+gem 'redis_rds', github: 'barcoo/redis_rds'
+gem 'byebug', group: [:development, :test]
 
 # To use debugger
 # gem 'debugger'
