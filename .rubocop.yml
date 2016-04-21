@@ -58,5 +58,8 @@ Style/MultilineMethodCallIndentation:
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 AllCops:
   TargetRubyVersion: 2.3
