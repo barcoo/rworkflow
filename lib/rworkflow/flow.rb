@@ -28,6 +28,8 @@ module Rworkflow
         raw = self.class.serializer.load(serialized)
         @lifecycle = Rworkflow::Lifecycle.unserialize(raw) unless raw.nil?
       end
+    rescue
+      @lifecycle = nil
     end
     private :load_lifecycle
 
