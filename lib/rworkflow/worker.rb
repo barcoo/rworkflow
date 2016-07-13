@@ -5,7 +5,7 @@ module Rworkflow
     include Sidekiq::Worker
     include SidekiqHelper
 
-    sidekiq_options queue: :mysql2
+    sidekiq_options queue: :mysql
 
     def perform(id, state_name)
       @workflow = self.class.load_workflow(id)
