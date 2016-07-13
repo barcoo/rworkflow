@@ -12,3 +12,4 @@ test/dummy/.sass-cache
 .rvmrc
 Gemfile.lock
 .byebug_history
+.rubocop-*
