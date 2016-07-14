@@ -38,7 +38,7 @@ module Rworkflow
       Rails.logger.debug("State #{@state_name} pushed back #{objects.size} objects (flow #{@workflow.id})")
     end
 
-    def process(objects)
+    def process(_objects)
       raise NotImplementedError
     end
 
@@ -52,9 +52,7 @@ module Rworkflow
 
       def load_workflow(id)
         workflow = Flow.load(id)
-        if !workflow.nil? && workflow.valid?
-          return workflow
-        end
+        return workflow if !workflow.nil? && workflow.valid?
 
         Rails.logger.warn("Worker #{self.name} tried to load non existent workflow #{id}")
         return nil
