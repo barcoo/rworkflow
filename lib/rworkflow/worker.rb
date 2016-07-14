@@ -30,12 +30,12 @@ module Rworkflow
 
     def transition(to_state, objects)
       @workflow.transition(@state_name, to_state, objects)
-      Rails.logger.debug("State #{@state_name} transitioned #{objects.size} objects to state #{to_state} (flow #{@workflow.id})")
+      Rails.logger.debug("State #{@state_name} transitioned #{Array.wrap(objects).size} objects to state #{to_state} (flow #{@workflow.id})")
     end
 
     def push_back(objects)
       @workflow.push(objects, @state_name)
-      Rails.logger.debug("State #{@state_name} pushed back #{objects.size} objects (flow #{@workflow.id})")
+      Rails.logger.debug("State #{@state_name} pushed back #{Array.wrap(objects).size} objects (flow #{@workflow.id})")
     end
 
     def process(_objects)
