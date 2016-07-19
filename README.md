@@ -1,6 +1,6 @@
 # Rworkflow
 
-[![GitHub release](https://img.shields.io/badge/release-0.4.0-blue.png)](https://github.com/barcoo/rworkflow/releases/tag/0.4.0)
+[![GitHub release](https://img.shields.io/badge/release-0.6.1-blue.png)](https://github.com/barcoo/rworkflow/releases/tag/0.6.1)
 [![Build Status](https://travis-ci.org/barcoo/rworkflow.svg?branch=master)](https://travis-ci.org/barcoo/rworkflow)
 
 The rworkflow framework removes many headaches when it comes to asynchronous tasks that need to run after the other, depending on their previous state.
