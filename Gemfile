@@ -12,6 +12,5 @@ gemspec
 
 gem 'redis_rds', github: 'barcoo/redis_rds'
 gem 'byebug', group: [:development, :test]
-
-# To use debugger
-# gem 'debugger'
+gem 'simplecov', require: false, group: :test
+gem 'coveralls', require: false
