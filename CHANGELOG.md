@@ -1,5 +1,16 @@
 # Changelog
 
+##0.6.2
+
+- [38e6271](https://github.com/barcoo/rworkflow/commit/38e6271) *2016-08-02* __updated rake release task__ (Nicolas Pepin-Perreault)
+- [d501cbd](https://github.com/barcoo/rworkflow/commit/d501cbd) *2016-08-02* __updated gemspec__ (Nicolas Pepin-Perreault)
+- [1da9341](https://github.com/barcoo/rworkflow/commit/1da9341) *2016-08-02* __ignore .gem files__ (Nicolas Pepin-Perreault)
+- [14da014](https://github.com/barcoo/rworkflow/commit/14da014) *2016-08-02* __updated gemspec__ (Nicolas Pepin-Perreault)
+- [11c7876](https://github.com/barcoo/rworkflow/commit/11c7876) *2016-08-02* __added redis_rds from rubygems__ (Nicolas Pepin-Perreault)
+- [6858a0d](https://github.com/barcoo/rworkflow/commit/6858a0d) *2016-07-25* __add coveralls status badge__ (Sergio Medina)
+- [ef464f5](https://github.com/barcoo/rworkflow/commit/ef464f5) *2016-07-25* __add code coverage tools__ (Sergio Medina)
+- [563718a](https://github.com/barcoo/rworkflow/commit/563718a) *2016-07-25* __ignore .md-u files__ (Sergio Medina)
+
 ##0.6.1
 
 - [db3e65b](https://github.com/barcoo/rworkflow/commit/db3e65b) *2016-07-19* __version bump to 0.6.1__ (Sergio Medina)
