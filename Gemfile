@@ -10,7 +10,6 @@ gemspec
 # Git. Remember to move these dependencies to your gemspec before releasing
 # your gem to rubygems.org.
 
-gem 'redis_rds', github: 'barcoo/redis_rds'
 gem 'byebug', group: [:development, :test]
 gem 'simplecov', require: false, group: :test
 gem 'coveralls', require: false
