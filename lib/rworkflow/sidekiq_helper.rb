@@ -38,7 +38,7 @@ module Rworkflow
       end
 
       def should_perform_job_async?
-        return Rails.env.production?
+        return Rworkflow.config.sidekiq_perform_async
       end
 
       def inline_perform(params)
