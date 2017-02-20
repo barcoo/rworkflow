@@ -1,2 +1,6 @@
 inherit_from:
   - https://raw.githubusercontent.com/barcoo/barcoop/master/rubocop.yml
+
+require:
+  - ./cops/avoid_rails_env.rb
+  
