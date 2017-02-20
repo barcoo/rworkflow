@@ -1,7 +1,7 @@
 # Rworkflow
 
 [![GitHub release](https://img.shields.io/badge/release-0.6.3-blue.png)](https://github.com/barcoo/rworkflow/releases/tag/0.6.3)
-[![Build Status](https://travis-ci.org/barcoo/rworkflow.svg?branch=master)](https://travis-ci.org/barcoo/rworkflow)
+[![Build Status](https://travis-ci.org/barcoo/rworkflow.svg?branch=master&cache=busted)](https://travis-ci.org/barcoo/rworkflow)
 [![Coverage Status](https://coveralls.io/repos/github/barcoo/rworkflow/badge.svg?branch=master)](https://coveralls.io/github/barcoo/rworkflow?branch=master)
 
 The rworkflow framework removes many headaches when it comes to asynchronous tasks that need to run after the other, depending on their previous state.
