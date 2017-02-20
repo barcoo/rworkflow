@@ -1,6 +1,7 @@
 require 'redis_rds'
 
 require 'rworkflow/version'
+require 'rworkflow/configuration'
 require 'rworkflow/sidekiq_helper'
 require 'rworkflow/flow_registry'
 require 'rworkflow/flow'
