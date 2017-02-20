@@ -5,7 +5,7 @@ require 'rworkflow/version'
 Gem::Specification.new do |s|
   s.name = 'rworkflow'
   s.version = Rworkflow::VERSION
-  s.required_ruby_version = '>= 2.3'
+  s.required_ruby_version = '>= 2'
   s.authors = ['barcoo']
   s.email = ['roots@checkitmobile.com']
   s.homepage = 'https://www.barcoo.com'
