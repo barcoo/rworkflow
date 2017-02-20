@@ -1,6 +1,6 @@
 # Rworkflow
 
-[![GitHub release](https://img.shields.io/badge/release-0.6.2-blue.png)](https://github.com/barcoo/rworkflow/releases/tag/0.6.2)
+[![GitHub release](https://img.shields.io/badge/release-0.6.3-blue.png)](https://github.com/barcoo/rworkflow/releases/tag/0.6.3)
 [![Build Status](https://travis-ci.org/barcoo/rworkflow.svg?branch=master)](https://travis-ci.org/barcoo/rworkflow)
 [![Coverage Status](https://coveralls.io/repos/github/barcoo/rworkflow/badge.svg?branch=master)](https://coveralls.io/github/barcoo/rworkflow?branch=master)
 

@@ -1,5 +1,18 @@
 # Changelog
 
+##0.6.3
+
+- [703c631](https://github.com/barcoo/rworkflow/commit/703c631) *2017-02-20* __Merge branch 'config'__ (Sergio Medina)
+- [a6be474](https://github.com/barcoo/rworkflow/commit/a6be474) *2017-02-20* __add configuration__ (Sergio Medina)
+- [6417919](https://github.com/barcoo/rworkflow/commit/6417919) *2017-02-20* __Merge branch 'master' into config__ (Sergio Medina)
+- [e366ff1](https://github.com/barcoo/rworkflow/commit/e366ff1) *2017-02-20* __Update .travis.yml__ (Sergio Medina)
+- [c054df5](https://github.com/barcoo/rworkflow/commit/c054df5) *2017-02-20* __require ruby 2.3__ (Sergio Medina)
+- [4fe39d6](https://github.com/barcoo/rworkflow/commit/4fe39d6) *2017-02-20* __we only support ruby 2.3__ (Sergio Medina)
+- [ddde160](https://github.com/barcoo/rworkflow/commit/ddde160) *2017-02-20* __fix bundle exec rails console__ (Sergio Medina)
+- [db40a97](https://github.com/barcoo/rworkflow/commit/db40a97) *2017-02-20* __remove config__ (Sergio Medina)
+- [98ce185](https://github.com/barcoo/rworkflow/commit/98ce185) *2017-02-20* __fix tests__ (Sergio Medina)
+- [41d23d8](https://github.com/barcoo/rworkflow/commit/41d23d8) *2017-02-20* __add AvoidRailsEnv cop__ (Sergio Medina)
+
 ##0.6.2
 
 - [38e6271](https://github.com/barcoo/rworkflow/commit/38e6271) *2016-08-02* __updated rake release task__ (Nicolas Pepin-Perreault)
