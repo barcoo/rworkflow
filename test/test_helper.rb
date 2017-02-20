@@ -15,6 +15,8 @@ require 'rails/test_help'
 
 Rails.backtrace_cleaner.remove_silencers!
 
+Rworkflow.config.sidekiq_perform_async = false
+
 connection = Redis.new(
   host: 'localhost',
   db: 1,
