@@ -55,18 +55,18 @@ module Rworkflow
 
     # Static methods
     class << self
-      def configure_server host, port, db
+      def configure_server(host, port, db)
         Sidekiq.configure_server do |config|
-          config.redis = {:url => "redis://#{host}:#{port}/#{db}", :namespace => 'sidekiq'}
+          config.redis = { url: "redis://#{host}:#{port}/#{db}", namespace: 'sidekiq' }
           config.server_middleware do |chain|
             chain.add SidekiqServerMiddleware
           end
         end
       end
 
-      def configure_client host, port, db
+      def configure_client(host, port, db)
         Sidekiq.configure_client do |config|
-          config.redis = {:url => "redis://#{host}:#{port}/#{db}", :namespace => 'sidekiq'}
+          config.redis = { url: "redis://#{host}:#{port}/#{db}", namespace: 'sidekiq' }
         end
       end
 
