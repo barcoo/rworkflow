@@ -9,14 +9,14 @@ module Rworkflow
 
     def test_workflow
       lifecycle = Lifecycle.new do |lc|
-        lc.state("State1", {cardinality: 2}) do |state|
+        lc.state('State1', cardinality: 2) do |state|
           state.transition :pushed, Flow::STATE_SUCCESSFUL
           state.transition :failed, Flow::STATE_FAILED
         end
 
-        lc.initial = "State1"
+        lc.initial = 'State1'
       end
-      initial_objects = [1,2,3]
+      initial_objects = [1, 2, 3]
       workflow = Flow.create(lifecycle, 'myWorkflow')
       workflow_id = workflow.id
 
@@ -48,17 +48,17 @@ module Rworkflow
       assert_equal 2, counters[Flow::STATE_SUCCESSFUL]
       assert_equal 1, counters[Flow::STATE_FAILED]
 
-      assert_equal [1,3], workflow.list_objects(Flow::STATE_SUCCESSFUL)
+      assert_equal [1, 3], workflow.list_objects(Flow::STATE_SUCCESSFUL)
     end
 
     def test_flow_cardinality_all_started
       lifecycle = Lifecycle.new do |lc|
-        lc.state("State1", {cardinality: Lifecycle::CARDINALITY_ALL_STARTED}) do |state|
+        lc.state('State1', cardinality: Lifecycle::CARDINALITY_ALL_STARTED) do |state|
           state.transition :pushed, Flow::STATE_SUCCESSFUL
           state.transition :failed, Flow::STATE_FAILED
         end
 
-        lc.initial = "State1"
+        lc.initial = 'State1'
       end
 
       initial_objects = (1..6).to_a
@@ -70,17 +70,17 @@ module Rworkflow
     end
 
     def test_flow_state_policy_wait
-      initial_objects = [1,2,3,4]
+      initial_objects = [1, 2, 3, 4]
       lifecycle = Lifecycle.new do |lc|
-        lc.state("InitState", {cardinality: 1}) do |state|
-          state.transition :pushed, "WaitState"
+        lc.state('InitState', cardinality: 1) do |state|
+          state.transition :pushed, 'WaitState'
         end
 
-        lc.state("WaitState", {cardinality: initial_objects.size, policy: State::STATE_POLICY_WAIT}) do |state|
+        lc.state('WaitState', cardinality: initial_objects.size, policy: State::STATE_POLICY_WAIT) do |state|
           state.transition :collected, Flow::STATE_SUCCESSFUL
         end
 
-        lc.initial = "InitState"
+        lc.initial = 'InitState'
       end
 
       workflow = Flow.create(lifecycle, 'myWorkflow')
@@ -93,7 +93,7 @@ module Rworkflow
         end
       end
 
-      workflow.fetch(1, 'WaitState') do |objects|
+      workflow.fetch(1, 'WaitState') do |_objects|
         # This block should not be executed
         assert false, 'The collector state should not be executed until there is enough waiting objects (>= cardinality)'
       end
