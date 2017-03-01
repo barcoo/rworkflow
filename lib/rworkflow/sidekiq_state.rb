@@ -19,8 +19,8 @@ module Rworkflow
       return cloned
     end
 
-    def ==(state)
-      return super && state.worker_class == @worker_class
+    def ==(other)
+      return super && other.worker_class == @worker_class
     end
 
     def to_h
