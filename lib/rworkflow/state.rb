@@ -1,20 +1,17 @@
 module Rworkflow
   class State
     DEFAULT_CARDINALITY = 1
-    DEFAULT_PRIORITY = nil
 
     # To be refactored into Policy objects
     STATE_POLICY_WAIT = :wait
     STATE_POLICY_NO_WAIT = :no_wait
 
-    attr_accessor :cardinality, :priority, :policy
+    attr_accessor :cardinality, :policy
     attr_reader :transitions
 
-    def initialize(cardinality: DEFAULT_CARDINALITY, priority: DEFAULT_PRIORITY, policy: STATE_POLICY_NO_WAIT, **_)
+    def initialize(cardinality: DEFAULT_CARDINALITY, policy: STATE_POLICY_NO_WAIT, **_)
       @cardinality = cardinality
-      @priority = priority
       @policy = policy
-
       @transitions = {}
     end
 
@@ -24,14 +21,13 @@ module Rworkflow
 
     def perform(name, default = nil)
       to_state = @transitions[name] || default
-      raise TransitionError.new(name) if to_state.nil?
+      raise(TransitionError, name) if to_state.nil?
       return to_state
     end
 
     # Default rule: new state overwrites old state when applicable
     def merge!(state)
       @cardinality = state.cardinality
-      @priority = state.priority
       @policy = state.policy
 
       @transitions.merge!(state.transitions) do |_, _, transition|
@@ -46,23 +42,19 @@ module Rworkflow
     end
 
     def clone
-      cloned = self.class.new(cardinality: @cardinality, priority: @priority, policy: @policy)
+      cloned = self.class.new(cardinality: @cardinality, policy: @policy)
       @transitions.each { |from, to| cloned.transition(from, to) }
       return cloned
     end
 
-    def ==(state)
-      return @cardinality == state.cardinality &&
-        @priority == state.priority &&
-        @policy == state.policy &&
-        @transitions == state.transitions
+    def ==(other)
+      return @cardinality == other.cardinality && @policy == other.policy && @transitions == other.transitions
     end
 
     def to_h
       return {
         transitions: @transitions,
         cardinality: @cardinality,
-        priority: @priority,
         policy: @policy
       }
     end
@@ -78,7 +70,7 @@ module Rworkflow
     end
 
     def inspect
-      return "[ Cardinality: #{@cardinality} ; Policy: #{@policy} ; Priority: #{@priority} ] -> #{to_graph.to_s}"
+      return "[ Cardinality: #{@cardinality} ; Policy: #{@policy} ] -> #{to_graph}"
     end
 
     def serialize
