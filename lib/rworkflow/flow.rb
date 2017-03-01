@@ -159,7 +159,7 @@ module Rworkflow
 
     def list_objects(state_name, limit = -1)
       list = get_list(state_name)
-      return list.get(0, limit).map {|object| self.class.serializer.load(object)}
+      return list.get(0, limit).map { |object| self.class.serializer.load(object) }
     end
 
     def get_state_list(state_name)
@@ -194,8 +194,7 @@ module Rworkflow
       end
     end
 
-    def post_process
-    end
+    def post_process; end
     protected :post_process
 
     def metadata_string
@@ -268,7 +267,7 @@ module Rworkflow
 
     def get(key, default = nil)
       value = @flow_data.get(key)
-      value = if value.nil? then default else self.class.serializer.load(value) end
+      value = value.nil? ? default : self.class.serializer.load(value)
 
       return value
     end
@@ -406,12 +405,14 @@ module Rworkflow
       def read_flow_class(id)
         klass = nil
         raw_class = id.split('__').first
-        klass = begin
-          raw_class.constantize
-        rescue NameError => _
-          Rails.logger.warn("Unknown flow class for workflow id #{id}")
-          nil
-        end if !raw_class.nil?
+        if !raw_class.nil?
+          klass = begin
+            raw_class.constantize
+          rescue NameError => _
+            Rails.logger.warn("Unknown flow class for workflow id #{id}")
+            nil
+          end
+        end
 
         return klass
       end
