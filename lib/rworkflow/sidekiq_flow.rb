@@ -44,7 +44,7 @@ module Rworkflow
     def continue
       return if self.finished? || !self.valid? || !self.paused?
       if @flow_data.decr(:paused) == 0
-        workers = Hash[get_counters.select { |name, _| !self.class.terminal?(name) && name != :processing }]
+        workers = Hash[counters.select { |name, _| !self.class.terminal?(name) && name != :processing }]
 
         # enqueue jobs
         workers.each { |worker, num_objects| create_jobs(worker, num_objects) }
@@ -157,7 +157,7 @@ module Rworkflow
       end
 
       def create_missing_jobs(flow, state_map)
-        counters = flow.get_counters
+        counters = flow.counters
         counters.each do |state, num_objects|
           next if flow.class.terminal?(state) || state == :processing
           enqueued = state_map.fetch(state, 0) * flow.get_state_cardinality(state)

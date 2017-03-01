@@ -8,12 +8,12 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2'
   s.authors = ['barcoo']
   s.email = ['roots@checkitmobile.com']
-  s.homepage = 'https://www.barcoo.com'
-  s.summary = 'TBC: Summary of Rworkflow.'
-  s.description = 'TBC: Description of Rworkflow.'
+  s.homepage = 'https://www.barcoo.com/'
+  s.summary = 'rworkflow - workflow framework for Ruby'
+  s.description = 'rworkflow - workflow framework for Ruby'
   s.license = 'MIT'
 
-  s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.rdoc']
+  s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
   s.test_files = Dir['test/**/*']
 
   s.add_dependency 'sidekiq', '~> 4'

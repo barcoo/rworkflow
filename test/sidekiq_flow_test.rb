@@ -30,7 +30,7 @@ module Rworkflow
       workflow.start(initial_objects)
 
       assert workflow.finished?
-      counters = workflow.get_counters
+      counters = workflow.counters
       assert_equal 19, counters[Rworkflow::Flow::STATE_FAILED]
       assert_equal 1, counters[Rworkflow::Flow::STATE_SUCCESSFUL]
 
@@ -65,7 +65,7 @@ module Rworkflow
       workflow.continue
       assert workflow.finished?
 
-      counters = workflow.get_counters
+      counters = workflow.counters
       assert_equal 18, counters[Rworkflow::Flow::STATE_FAILED]
       assert_equal 2, counters[Rworkflow::Flow::STATE_SUCCESSFUL]
 
@@ -119,7 +119,7 @@ module Rworkflow
       workflow.open_gate('Rworkflow::SidekiqFlowTest::Lifeboat')
       assert workflow.finished?
 
-      counters = workflow.get_counters
+      counters = workflow.counters
       assert_equal 18, counters[Rworkflow::Flow::STATE_FAILED]
       assert_equal 2, counters[Rworkflow::Flow::STATE_SUCCESSFUL]
 

@@ -40,7 +40,7 @@ module Rworkflow
 
     def finished?
       return false unless started?
-      total = get_counters.reduce(0) do |sum, pair|
+      total = counters.reduce(0) do |sum, pair|
         self.class.terminal?(pair[0]) ? sum : (sum + pair[1].to_i)
       end
 
@@ -49,13 +49,13 @@ module Rworkflow
 
     def status
       status = 'Running'
-      status = (successful?) ? 'Finished' : 'Failed' if finished?
+      status = successful? ? 'Finished' : 'Failed' if finished?
 
       return status
     end
 
     def created_at
-      return @created_at ||= begin Time.at(get(:created_at, 0)) end
+      return @created_at ||= begin Time.zone.at(get(:created_at, 0)) end
     end
 
     def started?
@@ -71,11 +71,11 @@ module Rworkflow
     end
 
     def start_time
-      return Time.at(get(:start_time, 0))
+      return Time.zone.at(get(:start_time, 0))
     end
 
     def finish_time
-      return Time.at(get(:finish_time, 0))
+      return Time.zone.at(get(:finish_time, 0))
     end
 
     def expected_duration
@@ -90,7 +90,7 @@ module Rworkflow
       return get_list(state).size
     end
 
-    def get_counters
+    def counters
       counters = @storage.get(:counters)
       if !counters.nil?
         counters = begin
@@ -100,11 +100,11 @@ module Rworkflow
           nil
         end
       end
-      return counters || get_counters!
+      return counters || counters!
     end
 
     # fetches counters atomically
-    def get_counters!
+    def counters!
       counters = { processing: 0 }
 
       names = @lifecycle.states.keys
@@ -122,7 +122,7 @@ module Rworkflow
 
       return counters
     end
-    private :get_counters!
+    private :counters!
 
     def fetch(fetcher_id, state_name)
       @processing.set(fetcher_id, 1)
@@ -183,7 +183,7 @@ module Rworkflow
           post_process
 
           if self.public?
-            counters = get_counters!
+            counters = counters!
             counters[:processing] = 0 # Some worker might have increased the processing flag at that time even if there is no more jobs to be done
             @storage.setnx(:counters, self.class.serializer.dump(counters))
             states_cleanup
@@ -319,7 +319,7 @@ module Rworkflow
     end
 
     def total_objects_processed(counters = nil)
-      return (counters || get_counters).reduce(0) do |sum, pair|
+      return (counters || counters).reduce(0) do |sum, pair|
         if self.class.terminal?(pair[0])
           sum + pair[1]
         else
@@ -329,11 +329,11 @@ module Rworkflow
     end
 
     def total_objects(counters = nil)
-      return (counters || get_counters).reduce(0) { |sum, pair| sum + pair[1] }
+      return (counters || counters).reduce(0) { |sum, pair| sum + pair[1] }
     end
 
     def total_objects_failed(counters = nil)
-      return (counters || get_counters).reduce(0) do |sum, pair|
+      return (counters || counters).reduce(0) do |sum, pair|
         if self.class.failure?(pair[0])
           sum + pair[1]
         else

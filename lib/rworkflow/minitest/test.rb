@@ -12,12 +12,10 @@ module Rworkflow
         rworkflow_teardown
       end
 
-      def rworkflow_setup
-      end
+      def rworkflow_setup; end
       protected :rworkflow_setup
 
-      def rworkflow_teardown
-      end
+      def rworkflow_teardown; end
       protected :rworkflow_teardown
 
       # @params [Class] the worker class to instantiate

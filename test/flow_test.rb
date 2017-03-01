@@ -44,7 +44,7 @@ module Rworkflow
       end
 
       assert workflow.finished?
-      counters = workflow.get_counters
+      counters = workflow.counters
       assert_equal 2, counters[Flow::STATE_SUCCESSFUL]
       assert_equal 1, counters[Flow::STATE_FAILED]
 
