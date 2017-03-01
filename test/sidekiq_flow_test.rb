@@ -79,7 +79,7 @@ module Rworkflow
           state.transition :sent, 'Rworkflow::SidekiqFlowTest::PostcardCollector'
         end
 
-        lc.state("Rworkflow::SidekiqFlowTest::PostcardCollector", {cardinality: Lifecycle::CARDINALITY_ALL_STARTED, priority: State::DEFAULT_PRIORITY, policy: State::STATE_POLICY_WAIT}) do |state|
+        lc.state("Rworkflow::SidekiqFlowTest::PostcardCollector", {cardinality: Lifecycle::CARDINALITY_ALL_STARTED, policy: State::STATE_POLICY_WAIT}) do |state|
           state.transition :received, Rworkflow::Flow::STATE_SUCCESSFUL
         end
 

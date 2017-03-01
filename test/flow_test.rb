@@ -76,7 +76,7 @@ module Rworkflow
           state.transition :pushed, "WaitState"
         end
 
-        lc.state("WaitState", {cardinality: initial_objects.size, priority: State::DEFAULT_PRIORITY, policy: State::STATE_POLICY_WAIT}) do |state|
+        lc.state("WaitState", {cardinality: initial_objects.size, policy: State::STATE_POLICY_WAIT}) do |state|
           state.transition :collected, Flow::STATE_SUCCESSFUL
         end
 

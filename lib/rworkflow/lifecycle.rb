@@ -7,9 +7,8 @@ module Rworkflow
 
     DEFAULT_STATE_OPTIONS = {
       cardinality: State::DEFAULT_CARDINALITY,
-      priority: State::DEFAULT_PRIORITY,
       policy: State::STATE_POLICY_NO_WAIT
-    }
+    }.freeze
 
     def initialize(state_class: State, state_options: {})
       @state_options = DEFAULT_STATE_OPTIONS.merge(state_options)
@@ -30,7 +29,7 @@ module Rworkflow
 
     def transition(from, name)
       from_state = @states[from]
-      fail(StateError, from) if from_state.nil?
+      raise(StateError, from) if from_state.nil?
 
       return from_state.perform(name, @default)
     end

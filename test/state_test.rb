@@ -37,10 +37,6 @@ module Rworkflow
       assert_not_equal @state, other_state, 'State A != B: different policies!'
 
       other_state = State.new
-      other_state.priority = :high
-      assert_not_equal @state, other_state, 'State A != B: different priorities!'
-
-      other_state = State.new
       other_state.cardinality = 32
       assert_not_equal @state, other_state, 'State A != B: different cardinalities!'
 
@@ -74,14 +70,13 @@ module Rworkflow
       @state.transition('a', 'b')
       @state.policy = State::STATE_POLICY_WAIT
       @state.cardinality = 2
-      @state.priority = :high
       cloned = @state.clone
       assert_equal @state, cloned, 'Original and cloned states should be equal'
       assert !@state.equal?(cloned), 'Original and cloned states should not be the same object'
     end
 
     def test_merge
-      other_state = State.new(cardinality: 2, priority: :high, policy: State::STATE_POLICY_WAIT)
+      other_state = State.new(cardinality: 2, policy: State::STATE_POLICY_WAIT)
       merged = @state.merge(other_state)
       assert_equal merged, other_state, 'Merged state should be equal to state B'
 

@@ -3,35 +3,14 @@ require 'sidekiq/api'
 module Rworkflow
   module SidekiqHelper
     def self.included(klass)
-      klass.send :extend,  ClassMethods
-      klass.send :include, InstanceMethods
+      klass.send :extend, ClassMethods
     end
 
     module ClassMethods
       # Mix-in methods
       def enqueue_job(*params)
-        enqueue_job_with_priority(nil, *params)
-      end
-
-      def enqueue_job_with_priority(priority, *params)
         if should_perform_job_async?
-          self.perform_with_priority(priority, *params)
-        else
-          inline_perform(params)
-        end
-      end
-
-      def enqueue_job_at(at_time, *params)
-        if should_perform_job_async?
-          self.perform_at(at_time, *params)
-        else
-          inline_perform(params)
-        end
-      end
-
-      def enqueue_job_in(time_diff, *params)
-        if should_perform_job_async?
-          self.perform_in(time_diff, *params)
+          self.perform_async(*params)
         else
           inline_perform(params)
         end
@@ -48,9 +27,6 @@ module Rworkflow
         worker.jid = jid
         worker.perform(*args)
       end
-    end
-
-    module InstanceMethods
     end
 
     # Static methods
@@ -70,14 +46,9 @@ module Rworkflow
         end
       end
 
-      def get_queue_sizes
+      def queue_sizes
         stats = Sidekiq::Stats.new
         return stats.queues
-      end
-
-      def get_queue_sizes_sum
-        stats = Sidekiq::Stats.new
-        return stats.enqueued
       end
     end
   end

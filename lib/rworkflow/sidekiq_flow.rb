@@ -1,9 +1,7 @@
 module Rworkflow
   class SidekiqFlow < Flow
-
     STATE_POLICY_GATED = :gated
     MAX_EXPECTED_DURATION = 4.hours
-    PRIORITIES = [:critical, :high, nil, :low]
 
     def initialize(id)
       super(id)
@@ -12,7 +10,7 @@ module Rworkflow
 
     def cleanup
       super()
-      @open_gates.delete()
+      @open_gates.delete
     end
 
     def push(objects, name)
@@ -32,7 +30,7 @@ module Rworkflow
     end
 
     def status
-      return (paused?) ? 'Paused' : super()
+      return paused? ? 'Paused' : super()
     end
 
     def pause
@@ -72,19 +70,14 @@ module Rworkflow
       if !worker_class.nil?
         cardinality = get_state_cardinality(state_name)
 
-        if state.policy == State::STATE_POLICY_WAIT
-          amount = ((num_objects + get_state_list(state_name).size) / cardinality.to_f).floor
+        amount = if state.policy == State::STATE_POLICY_WAIT
+          ((num_objects + get_state_list(state_name).size) / cardinality.to_f).floor
         else
-          amount = (num_objects / cardinality.to_f).ceil
+          (num_objects / cardinality.to_f).ceil
         end
 
-        state_priority = self.priority || state.priority
-        amount.times { worker_class.enqueue_job_with_priority(state_priority, @id, state_name) }
+        amount.times { worker_class.enqueue_job(@id, state_name) }
       end
-    end
-
-    def priority
-      return @priority ||= begin self.get(:priority) end
     end
 
     def gated?(state_name)
@@ -105,13 +98,7 @@ module Rworkflow
     class << self
       def create(lifecycle, name = '', options)
         workflow = super(lifecycle, name, options)
-        workflow.set(:priority, options[:priority]) unless options[:priority].nil?
-
         return workflow
-      end
-
-      def get_manual_priority
-        return :high
       end
 
       def cleanup_broken_flows
@@ -147,7 +134,7 @@ module Rworkflow
 
       def build_flow_map
         flow_map = {}
-        queues = SidekiqHelper.get_queue_sizes.keys
+        queues = SidekiqHelper.queue_sizes.keys
         queues.each do |queue_name|
           queue = Sidekiq::Queue.new(queue_name)
           queue.each do |job|
