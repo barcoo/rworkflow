@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2'
   s.authors = ['barcoo']
   s.email = ['roots@checkitmobile.com']
-  s.homepage = 'https://www.barcoo.com/'
+  s.homepage = 'https://github.com/barcoo/rworkflow'
   s.summary = 'rworkflow - workflow framework for Ruby'
   s.description = 'rworkflow - workflow framework for Ruby'
   s.license = 'MIT'
