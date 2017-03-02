@@ -5,9 +5,11 @@ module Rworkflow
 
     CARDINALITY_ALL_STARTED = :all_started # Indicates a cardinality equal to the jobs pushed at the start of the workflow
 
+    DEFAULT_CARDINALITY = State::DEFAULT_CARDINALITY
+    STATE_POLICY_NO_WAIT = State::STATE_POLICY_NO_WAIT
     DEFAULT_STATE_OPTIONS = {
-      cardinality: State::DEFAULT_CARDINALITY,
-      policy: State::STATE_POLICY_NO_WAIT
+      cardinality: self::DEFAULT_CARDINALITY,
+      policy: self::STATE_POLICY_NO_WAIT
     }.freeze
 
     def initialize(state_class: State, state_options: {})

@@ -40,7 +40,7 @@ module Rworkflow
 
     def finished?
       return false unless started?
-      total = counters.reduce(0) do |sum, pair|
+      total = self.counters.reduce(0) do |sum, pair|
         self.class.terminal?(pair[0]) ? sum : (sum + pair[1].to_i)
       end
 
@@ -91,21 +91,21 @@ module Rworkflow
     end
 
     def counters
-      counters = @storage.get(:counters)
-      if !counters.nil?
-        counters = begin
-          self.class.serializer.load(counters)
+      the_counters = @storage.get(:counters)
+      if !the_counters.nil?
+        the_counters = begin
+          self.class.serializer.load(the_counters)
         rescue => e
           Rails.logger.error("Error loading stored flow counters: #{e.message}")
           nil
         end
       end
-      return counters || counters!
+      return the_counters || counters!
     end
 
     # fetches counters atomically
     def counters!
-      counters = { processing: 0 }
+      the_counters = { processing: 0 }
 
       names = @lifecycle.states.keys
       results = RedisRds::Object.connection.multi do
@@ -115,12 +115,12 @@ module Rworkflow
       end
 
       (self.class::STATES_TERMINAL + names).each do |name|
-        counters[name] = results.shift.to_i
+        the_counters[name] = results.shift.to_i
       end
 
-      counters[:processing] = results.shift.reduce(0) { |sum, pair| sum + pair.last.to_i }
+      the_counters[:processing] = results.shift.reduce(0) { |sum, pair| sum + pair.last.to_i }
 
-      return counters
+      return the_counters
     end
     private :counters!
 
@@ -183,9 +183,9 @@ module Rworkflow
           post_process
 
           if self.public?
-            counters = counters!
-            counters[:processing] = 0 # Some worker might have increased the processing flag at that time even if there is no more jobs to be done
-            @storage.setnx(:counters, self.class.serializer.dump(counters))
+            the_counters = self.counters!
+            the_counters[:processing] = 0 # Some worker might have increased the processing flag at that time even if there is no more jobs to be done
+            @storage.setnx(:counters, self.class.serializer.dump(the_counters))
             states_cleanup
           else
             self.cleanup
@@ -318,7 +318,7 @@ module Rworkflow
     end
 
     def total_objects_processed(counters = nil)
-      return (counters || counters).reduce(0) do |sum, pair|
+      return (counters || self.counters).reduce(0) do |sum, pair|
         if self.class.terminal?(pair[0])
           sum + pair[1]
         else
@@ -328,11 +328,11 @@ module Rworkflow
     end
 
     def total_objects(counters = nil)
-      return (counters || counters).reduce(0) { |sum, pair| sum + pair[1] }
+      return (counters || self.counters).reduce(0) { |sum, pair| sum + pair[1] }
     end
 
     def total_objects_failed(counters = nil)
-      return (counters || counters).reduce(0) do |sum, pair|
+      return (counters || self.counters).reduce(0) do |sum, pair|
         if self.class.failure?(pair[0])
           sum + pair[1]
         else

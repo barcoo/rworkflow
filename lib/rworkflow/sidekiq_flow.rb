@@ -44,7 +44,7 @@ module Rworkflow
     def continue
       return if self.finished? || !self.valid? || !self.paused?
       if @flow_data.decr(:paused) == 0
-        workers = Hash[counters.select { |name, _| !self.class.terminal?(name) && name != :processing }]
+        workers = Hash[self.counters.select { |name, _| !self.class.terminal?(name) && name != :processing }]
 
         # enqueue jobs
         workers.each { |worker, num_objects| create_jobs(worker, num_objects) }
