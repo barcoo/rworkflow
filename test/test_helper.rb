@@ -4,10 +4,10 @@ ENV['RAILS_ENV'] = 'test'
 require 'simplecov'
 require 'coveralls'
 
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
   SimpleCov::Formatter::HTMLFormatter,
   Coveralls::SimpleCov::Formatter
-]
+])
 SimpleCov.start
 
 require File.expand_path('../dummy/config/environment.rb', __FILE__)

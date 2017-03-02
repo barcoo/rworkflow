@@ -11,5 +11,5 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'byebug', group: [:development, :test]
-gem 'simplecov', require: false, group: :test
 gem 'coveralls', require: false
+gem 'simplecov', require: false, group: :test

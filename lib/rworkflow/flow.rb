@@ -40,7 +40,7 @@ module Rworkflow
 
     def finished?
       return false unless started?
-      total = get_counters.reduce(0) do |sum, pair|
+      total = self.counters.reduce(0) do |sum, pair|
         self.class.terminal?(pair[0]) ? sum : (sum + pair[1].to_i)
       end
 
@@ -49,13 +49,13 @@ module Rworkflow
 
     def status
       status = 'Running'
-      status = (successful?) ? 'Finished' : 'Failed' if finished?
+      status = successful? ? 'Finished' : 'Failed' if finished?
 
       return status
     end
 
     def created_at
-      return @created_at ||= begin Time.at(get(:created_at, 0)) end
+      return @created_at ||= begin Time.zone.at(get(:created_at, 0)) end
     end
 
     def started?
@@ -71,11 +71,11 @@ module Rworkflow
     end
 
     def start_time
-      return Time.at(get(:start_time, 0))
+      return Time.zone.at(get(:start_time, 0))
     end
 
     def finish_time
-      return Time.at(get(:finish_time, 0))
+      return Time.zone.at(get(:finish_time, 0))
     end
 
     def expected_duration
@@ -90,22 +90,22 @@ module Rworkflow
       return get_list(state).size
     end
 
-    def get_counters
-      counters = @storage.get(:counters)
-      if !counters.nil?
-        counters = begin
-          self.class.serializer.load(counters)
+    def counters
+      the_counters = @storage.get(:counters)
+      if !the_counters.nil?
+        the_counters = begin
+          self.class.serializer.load(the_counters)
         rescue => e
           Rails.logger.error("Error loading stored flow counters: #{e.message}")
           nil
         end
       end
-      return counters || get_counters!
+      return the_counters || counters!
     end
 
     # fetches counters atomically
-    def get_counters!
-      counters = { processing: 0 }
+    def counters!
+      the_counters = { processing: 0 }
 
       names = @lifecycle.states.keys
       results = RedisRds::Object.connection.multi do
@@ -115,14 +115,14 @@ module Rworkflow
       end
 
       (self.class::STATES_TERMINAL + names).each do |name|
-        counters[name] = results.shift.to_i
+        the_counters[name] = results.shift.to_i
       end
 
-      counters[:processing] = results.shift.reduce(0) { |sum, pair| sum + pair.last.to_i }
+      the_counters[:processing] = results.shift.reduce(0) { |sum, pair| sum + pair.last.to_i }
 
-      return counters
+      return the_counters
     end
-    private :get_counters!
+    private :counters!
 
     def fetch(fetcher_id, state_name)
       @processing.set(fetcher_id, 1)
@@ -159,7 +159,7 @@ module Rworkflow
 
     def list_objects(state_name, limit = -1)
       list = get_list(state_name)
-      return list.get(0, limit).map {|object| self.class.serializer.load(object)}
+      return list.get(0, limit).map { |object| self.class.serializer.load(object) }
     end
 
     def get_state_list(state_name)
@@ -183,9 +183,9 @@ module Rworkflow
           post_process
 
           if self.public?
-            counters = get_counters!
-            counters[:processing] = 0 # Some worker might have increased the processing flag at that time even if there is no more jobs to be done
-            @storage.setnx(:counters, self.class.serializer.dump(counters))
+            the_counters = self.counters!
+            the_counters[:processing] = 0 # Some worker might have increased the processing flag at that time even if there is no more jobs to be done
+            @storage.setnx(:counters, self.class.serializer.dump(the_counters))
             states_cleanup
           else
             self.cleanup
@@ -194,8 +194,7 @@ module Rworkflow
       end
     end
 
-    def post_process
-    end
+    def post_process; end
     protected :post_process
 
     def metadata_string
@@ -268,7 +267,7 @@ module Rworkflow
 
     def get(key, default = nil)
       value = @flow_data.get(key)
-      value = if value.nil? then default else self.class.serializer.load(value) end
+      value = value.nil? ? default : self.class.serializer.load(value)
 
       return value
     end
@@ -319,7 +318,7 @@ module Rworkflow
     end
 
     def total_objects_processed(counters = nil)
-      return (counters || get_counters).reduce(0) do |sum, pair|
+      return (counters || self.counters).reduce(0) do |sum, pair|
         if self.class.terminal?(pair[0])
           sum + pair[1]
         else
@@ -329,11 +328,11 @@ module Rworkflow
     end
 
     def total_objects(counters = nil)
-      return (counters || get_counters).reduce(0) { |sum, pair| sum + pair[1] }
+      return (counters || self.counters).reduce(0) { |sum, pair| sum + pair[1] }
     end
 
     def total_objects_failed(counters = nil)
-      return (counters || get_counters).reduce(0) do |sum, pair|
+      return (counters || self.counters).reduce(0) do |sum, pair|
         if self.class.failure?(pair[0])
           sum + pair[1]
         else
@@ -406,12 +405,14 @@ module Rworkflow
       def read_flow_class(id)
         klass = nil
         raw_class = id.split('__').first
-        klass = begin
-          raw_class.constantize
-        rescue NameError => _
-          Rails.logger.warn("Unknown flow class for workflow id #{id}")
-          nil
-        end if !raw_class.nil?
+        if !raw_class.nil?
+          klass = begin
+            raw_class.constantize
+          rescue NameError => _
+            Rails.logger.warn("Unknown flow class for workflow id #{id}")
+            nil
+          end
+        end
 
         return klass
       end
