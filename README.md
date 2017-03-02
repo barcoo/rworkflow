@@ -94,17 +94,17 @@ workflow.start(initial_jobs)
 
 Notes:
 
-- Create a new Sidekiq flow using the lifecycle object defined in the firt step above
+- Create a new Sidekiq flow using the lifecycle object defined in the first step above
 - Run flow.start passing in an array of objects
 - The objects need to be serializable
 - _options_ can contain several properties for the workflow (TODO: complete/expand)
 
 # Roadmap
 
-1. Decouple persistence layer (for now rworkflow depends on redis_rds which, in turn, depends on, guess, redis)
-2. Add to RubyGems
-3. See [State and Transition Policies](doc/states_and_transitions_policies.rdoc).
-4. Test Helper (simplify tests)
-5. Improve logging
-6. Use a separated Redis instance/db instead of a namespace?
-7. sidekiq dependency should be optional
+1. Decouple persistence layer (for now rworkflow depends on redis_rds which, in turn, depends on redis)
+2. See [State and Transition Policies](doc/states_and_transitions_policies.rdoc).
+3. Test Helper (simplify tests)
+4. Improve logging
+5. Use a separated Redis instance/db instead of a namespace?
+6. sidekiq and rails dependencies should be optional
+7. Move Web UI from CimRails to here
