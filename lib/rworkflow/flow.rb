@@ -183,7 +183,7 @@ module Rworkflow
           post_process
 
           if self.public?
-            the_counters = self.counters!
+            the_counters = counters!
             the_counters[:processing] = 0 # Some worker might have increased the processing flag at that time even if there is no more jobs to be done
             @storage.setnx(:counters, self.class.serializer.dump(the_counters))
             states_cleanup
