@@ -13,3 +13,4 @@ gemspec
 gem 'byebug', group: [:development, :test]
 gem 'coveralls', require: false
 gem 'simplecov', require: false, group: :test
+gem 'barcoop' # barcoo shared rubocop config file and cops
