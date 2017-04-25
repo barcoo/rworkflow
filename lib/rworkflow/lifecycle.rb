@@ -5,6 +5,7 @@ module Rworkflow
 
     CARDINALITY_ALL_STARTED = :all_started # Indicates a cardinality equal to the jobs pushed at the start of the workflow
 
+    RESERVED_STATE_NAMES = [Rworkflow::Flow::STATE_FAILED, Rworkflow::Flow::STATE_SUCCESSFUL].map(&:to_s).freeze
     DEFAULT_CARDINALITY = State::DEFAULT_CARDINALITY
     STATE_POLICY_NO_WAIT = State::STATE_POLICY_NO_WAIT
     DEFAULT_STATE_OPTIONS = {
@@ -15,7 +16,7 @@ module Rworkflow
     def initialize(state_class: State, state_options: {})
       @state_options = DEFAULT_STATE_OPTIONS.merge(state_options)
       @state_class = state_class
-      @states = {}
+      @states = {}.with_indifferent_access
       @default = nil
       yield(self) if block_given?
     end
@@ -23,6 +24,9 @@ module Rworkflow
     def state(name, options = {})
       options = @state_options.merge(options)
       new_state = @state_class.new(**options)
+
+      raise ArgumentError, 'given state name is a reserved state name' if RESERVED_STATE_NAMES.include?(name.to_s)
+      raise ArgumentError, 'no two states can have the same name in a lifecycle' if @states.key?(name)
 
       yield(new_state) if block_given?
 
