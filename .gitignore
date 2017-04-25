@@ -16,3 +16,4 @@ Gemfile.lock
 *.md-u
 /coverage/
 *.gem
+vendor/bundle
